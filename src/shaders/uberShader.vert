@@ -1,16 +1,8 @@
 #version 300 es
 
-uniform Projection {
-  mat4 projMatrix;
-  float zNear;
-  float zFar;
-};
+-- DEFINES_HOOK --
 
-uniform View {
-  mat4 viewMatrix;
-  vec3 cameraPosition;
-  float time;
-};
+#include shared-ubo.glsl;
 
 uniform mat4 u_worldMatrix;
 
@@ -18,6 +10,15 @@ in vec4 aPosition;
 in vec3 aNormal;
 in vec2 aUv;
 
+out vec3 vNormal;
+out vec2 vUv;
+out vec3 vWorldPos;
+
 void main () {
-  gl_Position = projMatrix * viewMatrix * u_worldMatrix * aPosition;
+  vec4 worldPos = u_worldMatrix * aPosition;
+  gl_Position = projMatrix * viewMatrix * worldPos;
+
+  vNormal = aNormal;
+  vUv = aUv;
+  vWorldPos = worldPos.xyz;
 }
