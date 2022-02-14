@@ -1,7 +1,13 @@
 {
   "name": "webgl-pbr-dojo",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "description": "Explore physically based rendering with WebGL2",
+  "author": {
+    "email": "nikoloffgeorgi@gmail.com",
+    "name": "Georgi Nikolov",
+    "url": "https://georgi-nikolov.com"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
