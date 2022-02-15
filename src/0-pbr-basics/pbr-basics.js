@@ -1,3 +1,5 @@
+import { Pane } from 'tweakpane'
+
 import {
   createSphere,
   createUniformBlockInfo,
@@ -10,14 +12,50 @@ import {
 } from '../lib/hwoa-rang-gl2/dist'
 import { Easing } from '../lib/hwoa-rangtween/dist'
 
+import Sphere from './sphere'
+import Label from './label'
+
 const SPHERE_GRID_X_COUNT = 7
 const SPHERE_GRID_Y_COUNT = 7
 const SPHERE_GRID_WIDTH = 10
 const SPHERE_GRID_HEIGHT = 10
 const POINT_LIGHT_POSITIONS_COUNT = 4
+const TONEMAPPING_MODES = [
+  'aces',
+  'filmic',
+  'lottes',
+  'reinhard',
+  'reinhard2',
+  'uchimura',
+  'uncharted',
+  'unreal',
+]
+const tonemappingModeFloat32 = new Float32Array([2])
+const pointLightIntensityFloat32 = new Float32Array([40])
 
-import Sphere from './sphere'
-import Label from './label'
+const pane = new Pane()
+pane.element.parentNode.style.setProperty('width', '340px')
+pane
+  .addBlade({
+    view: 'list',
+    label: 'tone mapping mode',
+    options: TONEMAPPING_MODES.map((text) => ({ text, value: text })),
+    value: TONEMAPPING_MODES[2],
+  })
+  .on('change', ({ value }) => {
+    tonemappingModeFloat32[0] = TONEMAPPING_MODES.indexOf(value)
+  })
+pane
+  .addBlade({
+    view: 'slider',
+    label: 'point light luminance',
+    min: 0,
+    max: 50,
+    value: 20,
+  })
+  .on('change', ({ value }) => {
+    pointLightIntensityFloat32[0] = value
+  })
 
 const canvas = document.createElement('canvas')
 document.body.appendChild(canvas)
@@ -75,14 +113,13 @@ for (let y = 0; y < SPHERE_GRID_Y_COUNT; y++) {
       0,
     ])
 
-    const metallic = Easing.quad_In(y / SPHERE_GRID_Y_COUNT)
+    const metallic = y / SPHERE_GRID_Y_COUNT //Easing.quad_In(y / SPHERE_GRID_Y_COUNT)
     sphere.setUniform('u_metallic', {
       type: gl.FLOAT,
       value: metallic,
     })
 
-    const roughness =
-      1 / SPHERE_GRID_X_COUNT + Easing.quad_In(x / SPHERE_GRID_X_COUNT)
+    const roughness = 1 / SPHERE_GRID_X_COUNT + x / SPHERE_GRID_X_COUNT //Easing.quad_In(x / SPHERE_GRID_X_COUNT)
     sphere.setUniform('u_roughness', {
       type: gl.FLOAT,
       value: roughness,
@@ -132,7 +169,12 @@ const lightingUBOInfo = createUniformBlockInfo(
   gl,
   scene.children[0].program,
   'Lighting',
-  ['lightPositions', 'lightColors'],
+  [
+    'pointLightPositions',
+    'pointLightColors',
+    'pointLightIntensity',
+    'tonemappingMode',
+  ],
 )
 
 const lightingUBO = createAndBindUBOToBase(gl, lightingUBOInfo.blockSize, 2)
@@ -211,21 +253,33 @@ function drawFrame(ts) {
     pointLightsPositions[i][2] = Math.cos(speed) + 2 + 4
     gl.bufferSubData(
       gl.UNIFORM_BUFFER,
-      lightingUBOInfo.uniforms.lightPositions.offset +
+      lightingUBOInfo.uniforms.pointLightPositions.offset +
         i *
-          lightingUBOInfo.uniforms.lightPositions.size *
+          lightingUBOInfo.uniforms.pointLightPositions.size *
           Float32Array.BYTES_PER_ELEMENT,
       pointLightsPositions[i],
       0,
     )
     gl.bufferSubData(
       gl.UNIFORM_BUFFER,
-      lightingUBOInfo.uniforms.lightColors.offset +
+      lightingUBOInfo.uniforms.pointLightColors.offset +
         i * 4 * Float32Array.BYTES_PER_ELEMENT,
       pointLightsColors[i],
       0,
     )
   }
+  gl.bufferSubData(
+    gl.UNIFORM_BUFFER,
+    lightingUBOInfo.uniforms.tonemappingMode.offset,
+    tonemappingModeFloat32,
+    0,
+  )
+  gl.bufferSubData(
+    gl.UNIFORM_BUFFER,
+    lightingUBOInfo.uniforms.pointLightIntensity.offset,
+    pointLightIntensityFloat32,
+    0,
+  )
 
   gl.enable(gl.DEPTH_TEST)
   gl.enable(gl.BLEND)

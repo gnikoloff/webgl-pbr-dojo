@@ -18,7 +18,7 @@ void main () {
   vec4 worldPos = u_worldMatrix * aPosition;
   gl_Position = projMatrix * viewMatrix * worldPos;
 
-  vNormal = aNormal;
+  vNormal = mat3(u_worldMatrix) * aNormal;
   vUv = aUv;
   vWorldPos = worldPos.xyz;
 }

@@ -8,6 +8,8 @@ export default class Sphere extends Drawable {
   #viewUBOIndex
   #lightingUBOIndex
 
+  textures = []
+
   constructor(gl, geometry, defines) {
     super(
       gl,
@@ -74,10 +76,6 @@ export default class Sphere extends Drawable {
     this.gl.bindVertexArray(null)
 
     this.updateUniform('u_worldMatrix', this.worldMatrix)
-    this.setUniform('u_albedo', {
-      type: gl.FLOAT_VEC3,
-      value: new Float32Array([1, 0, 0]),
-    })
 
     this.#projectionUBOIndex = gl.getUniformBlockIndex(
       this.program,
@@ -91,6 +89,12 @@ export default class Sphere extends Drawable {
     this.gl.uniformBlockBinding(this.program, this.#projectionUBOIndex, 0)
     this.gl.uniformBlockBinding(this.program, this.#viewUBOIndex, 1)
     this.gl.uniformBlockBinding(this.program, this.#lightingUBOIndex, 2)
+
+    for (const [i, texture] of this.textures.entries()) {
+      this.gl.activeTexture(this.gl.TEXTURE0 + i)
+      this.gl.bindTexture(this.gl.TEXTURE_2D, texture)
+    }
+
     this.gl.useProgram(this.program)
     this.gl.bindVertexArray(this.vao)
     this.gl.drawElements(

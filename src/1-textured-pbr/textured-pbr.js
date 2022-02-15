@@ -1,3 +1,5 @@
+import { Pane } from 'tweakpane'
+
 import {
   createSphere,
   createUniformBlockInfo,
@@ -10,14 +12,90 @@ import {
 } from '../lib/hwoa-rang-gl2/dist'
 import { Easing } from '../lib/hwoa-rangtween/dist'
 
+import Sphere from './sphere'
+import Label from './label'
+
+import abedoMap0 from '../images/vintage/vintage-tile1_albedo-min.png'
+import aoMap0 from '../images/vintage/vintage-tile1_ao-min.png'
+import metallicMap0 from '../images/vintage/vintage-tile1_metallic-min.png'
+import normalMap0 from '../images/vintage/vintage-tile1_normal-ogl-min.png'
+import roughnessMap0 from '../images/vintage/vintage-tile1_roughness-min.png'
+
+import abedoMap1 from '../images/rust/rustediron2_basecolor-min.png'
+import aoMap1 from '../images/rust/rustediron2_ao-min.png'
+import metallicMap1 from '../images/rust/rustediron2_metallic-min.png'
+import normalMap1 from '../images/rust/rustediron2_normal-min.png'
+import roughnessMap1 from '../images/rust/rustediron2_roughness-min.png'
+
+import abedoMap2 from '../images/grass/leafy-grass2-albedo-min.png'
+import aoMap2 from '../images/grass/leafy-grass2-ao-min.png'
+import metallicMap2 from '../images/grass/leafy-grass2-metallic-min.png'
+import normalMap2 from '../images/grass/leafy-grass2-normal-ogl-min.png'
+import roughnessMap2 from '../images/grass/leafy-grass2-roughness-min.png'
+
 const SPHERE_GRID_X_COUNT = 7
 const SPHERE_GRID_Y_COUNT = 7
 const SPHERE_GRID_WIDTH = 10
 const SPHERE_GRID_HEIGHT = 10
-const POINT_LIGHT_POSITIONS_COUNT = 4
+const POINT_LIGHT_POSITIONS_COUNT = 1
+const TONEMAPPING_MODES = [
+  'aces',
+  'filmic',
+  'lottes',
+  'reinhard',
+  'reinhard2',
+  'uchimura',
+  'uncharted',
+  'unreal',
+]
 
-import Sphere from './sphere'
-import Label from './label'
+const PBR_TEXTURES_0 = [
+  abedoMap0,
+  normalMap0,
+  metallicMap0,
+  roughnessMap0,
+  aoMap0,
+]
+const PBR_TEXTURES_1 = [
+  abedoMap1,
+  normalMap1,
+  metallicMap1,
+  roughnessMap1,
+  aoMap1,
+]
+const PBR_TEXTURES_2 = [
+  abedoMap2,
+  normalMap2,
+  metallicMap2,
+  roughnessMap2,
+  aoMap2,
+]
+const tonemappingModeFloat32 = new Float32Array([1])
+const pointLightIntensityFloat32 = new Float32Array([48])
+
+const pane = new Pane()
+pane.element.parentNode.style.setProperty('width', '340px')
+pane
+  .addBlade({
+    view: 'list',
+    label: 'tone mapping mode',
+    options: TONEMAPPING_MODES.map((text) => ({ text, value: text })),
+    value: TONEMAPPING_MODES[1],
+  })
+  .on('change', ({ value }) => {
+    tonemappingModeFloat32[0] = TONEMAPPING_MODES.indexOf(value)
+  })
+pane
+  .addBlade({
+    view: 'slider',
+    label: 'point light luminance',
+    min: 0,
+    max: 500,
+    value: pointLightIntensityFloat32[0],
+  })
+  .on('change', ({ value }) => {
+    pointLightIntensityFloat32[0] = value
+  })
 
 const canvas = document.createElement('canvas')
 document.body.appendChild(canvas)
@@ -59,6 +137,7 @@ const labelGeometry = createPlane({
 })
 
 const scene = new SceneNode()
+const spheres = []
 
 const sphereDefines = {
   POINT_LIGHTS_COUNT: POINT_LIGHT_POSITIONS_COUNT.toString(),
@@ -74,41 +153,55 @@ for (let y = 0; y < SPHERE_GRID_Y_COUNT; y++) {
       y * gridStepY - SPHERE_GRID_HEIGHT / 2 + sphereGeometry.radius,
       0,
     ])
+    // .setRotation([
+    //   Math.random() * Math.PI * 2,
+    //   Math.random() * Math.PI * 2,
+    //   Math.random() * Math.PI * 2,
+    // ])
 
-    const metallic = Easing.quad_In(y / SPHERE_GRID_Y_COUNT)
-    sphere.setUniform('u_metallic', {
-      type: gl.FLOAT,
-      value: metallic,
+    sphere.setUniform('u_albedoMap', {
+      type: gl.INT,
+      value: 0,
     })
-
-    const roughness =
-      1 / SPHERE_GRID_X_COUNT + Easing.quad_In(x / SPHERE_GRID_X_COUNT)
-    sphere.setUniform('u_roughness', {
-      type: gl.FLOAT,
-      value: roughness,
+    sphere.setUniform('u_normalMap', {
+      type: gl.INT,
+      value: 1,
+    })
+    sphere.setUniform('u_metallicMap', {
+      type: gl.INT,
+      value: 2,
+    })
+    sphere.setUniform('u_roughnessMap', {
+      type: gl.INT,
+      value: 3,
+    })
+    sphere.setUniform('u_aoMap', {
+      type: gl.INT,
+      value: 4,
     })
 
     scene.addChild(sphere)
+    spheres.push(sphere)
   }
 }
 
-const roughnessLabel = new Label(gl, 'roughness', labelGeometry)
-roughnessLabel.setPosition([
-  -SPHERE_GRID_WIDTH / 2 + labelGeometry.width / 2,
-  -SPHERE_GRID_HEIGHT / 2 - labelGeometry.height,
-  0,
-])
-scene.addChild(roughnessLabel)
+// const roughnessLabel = new Label(gl, 'roughness', labelGeometry)
+// roughnessLabel.setPosition([
+//   -SPHERE_GRID_WIDTH / 2 + labelGeometry.width / 2,
+//   -SPHERE_GRID_HEIGHT / 2 - labelGeometry.height,
+//   0,
+// ])
+// scene.addChild(roughnessLabel)
 
-const metallicLabel = new Label(gl, 'metallic', labelGeometry)
-metallicLabel
-  .setPosition([
-    -SPHERE_GRID_WIDTH / 2 - labelGeometry.height,
-    -SPHERE_GRID_HEIGHT / 2 + labelGeometry.width / 2,
-    0,
-  ])
-  .setRotation([0, 0, Math.PI * 0.5])
-scene.addChild(metallicLabel)
+// const metallicLabel = new Label(gl, 'metallic', labelGeometry)
+// metallicLabel
+//   .setPosition([
+//     -SPHERE_GRID_WIDTH / 2 - labelGeometry.height,
+//     -SPHERE_GRID_HEIGHT / 2 + labelGeometry.width / 2,
+//     0,
+//   ])
+//   .setRotation([0, 0, Math.PI * 0.5])
+// scene.addChild(metallicLabel)
 
 // sphere.setPosition([1, 1, 0]).updateWorldMatrix()
 
@@ -132,10 +225,16 @@ const lightingUBOInfo = createUniformBlockInfo(
   gl,
   scene.children[0].program,
   'Lighting',
-  ['lightPositions', 'lightColors'],
+  [
+    'pointLightPositions',
+    'pointLightColors',
+    'pointLightIntensity',
+    'tonemappingMode',
+  ],
 )
 
 const lightingUBO = createAndBindUBOToBase(gl, lightingUBOInfo.blockSize, 2)
+console.log(lightingUBOInfo)
 
 const pointLightsPositions = []
 const pointLightsColors = []
@@ -143,12 +242,48 @@ const pointLightsColors = []
 for (let i = 0; i < POINT_LIGHT_POSITIONS_COUNT; i++) {
   pointLightsPositions.push(new Float32Array(3))
 
-  pointLightsColors.push(
-    new Float32Array([Math.random(), Math.random(), Math.random()]),
-  )
+  pointLightsColors.push(new Float32Array([1, 1, 1]))
 }
 
-console.log(pointLightsPositions)
+Promise.all([
+  Promise.all(
+    PBR_TEXTURES_0.map((imageURL) => loadGLTextureFromImage(imageURL, gl.RGB)),
+  ),
+  Promise.all(
+    PBR_TEXTURES_1.map((imageURL) => loadGLTextureFromImage(imageURL, gl.RGB)),
+  ),
+  Promise.all(
+    PBR_TEXTURES_2.map((imageURL) => loadGLTextureFromImage(imageURL, gl.RGB)),
+  ),
+]).then((texturePacks) => {
+  let texIdx = 0
+  spheres.forEach((sphere, i) => {
+    sphere.textures = texturePacks[texIdx]
+    texIdx++
+    if (texIdx === 3) {
+      texIdx = 0
+    }
+  })
+})
+// .then((textures) => {
+
+// })
+
+// .then((textures) => {
+//   spheres.forEach((sphere, i) => {
+//     if (i % 2 !== 0) {
+//       sphere.textures = textures
+//     }
+//   })
+// })
+
+// .then((textures) => {
+//   spheres.forEach((sphere, i) => {
+//     if (i % 3 === 0) {
+//       sphere.textures = textures
+//     }
+//   })
+// })
 
 requestAnimationFrame(drawFrame)
 onResize()
@@ -206,26 +341,36 @@ function drawFrame(ts) {
   const speed = ts * 0.001
   for (let i = 0; i < POINT_LIGHT_POSITIONS_COUNT; i++) {
     const lightStep = (Math.PI * 2) / POINT_LIGHT_POSITIONS_COUNT
-    pointLightsPositions[i][0] = Math.cos(i * lightStep + speed) * 10
-    pointLightsPositions[i][1] = Math.sin(i * lightStep + speed) * 10
-    pointLightsPositions[i][2] = Math.cos(speed) + 2 + 4
+    pointLightsPositions[i][0] = Math.cos(i * lightStep + speed) * 3
+    pointLightsPositions[i][1] = Math.sin(i * lightStep + speed) * 3
+    pointLightsPositions[i][2] = 5
     gl.bufferSubData(
       gl.UNIFORM_BUFFER,
-      lightingUBOInfo.uniforms.lightPositions.offset +
-        i *
-          lightingUBOInfo.uniforms.lightPositions.size *
-          Float32Array.BYTES_PER_ELEMENT,
+      lightingUBOInfo.uniforms.pointLightPositions.offset +
+        i * 4 * Float32Array.BYTES_PER_ELEMENT,
       pointLightsPositions[i],
       0,
     )
     gl.bufferSubData(
       gl.UNIFORM_BUFFER,
-      lightingUBOInfo.uniforms.lightColors.offset +
+      lightingUBOInfo.uniforms.pointLightColors.offset +
         i * 4 * Float32Array.BYTES_PER_ELEMENT,
       pointLightsColors[i],
       0,
     )
   }
+  gl.bufferSubData(
+    gl.UNIFORM_BUFFER,
+    lightingUBOInfo.uniforms.tonemappingMode.offset,
+    tonemappingModeFloat32,
+    0,
+  )
+  gl.bufferSubData(
+    gl.UNIFORM_BUFFER,
+    lightingUBOInfo.uniforms.pointLightIntensity.offset,
+    pointLightIntensityFloat32,
+    0,
+  )
 
   gl.enable(gl.DEPTH_TEST)
   gl.enable(gl.BLEND)
@@ -243,6 +388,33 @@ function drawFrame(ts) {
   // fsQuad.render()
 
   // gl.bindTexture(gl.TEXTURE_2D, null)
+}
+
+function loadGLTextureFromImage(imageSrc, format = gl.RGB) {
+  return new Promise((resolve, reject) => {
+    const image = new Image()
+    image.onload = () => {
+      const texture = gl.createTexture()
+      gl.bindTexture(gl.TEXTURE_2D, texture)
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        format,
+        image.naturalWidth,
+        image.naturalHeight,
+        0,
+        format,
+        gl.UNSIGNED_BYTE,
+        image,
+      )
+      gl.generateMipmap(gl.TEXTURE_2D)
+      resolve(texture)
+    }
+    image.onerror = (err) => reject(err)
+    image.src = window.BASE_URL
+      ? `${window.BASE_URL}assets${imageSrc}`
+      : imageSrc
+  })
 }
 
 function onResize() {

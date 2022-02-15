@@ -8,6 +8,16 @@ precision highp float;
 #include pbr/distribution-ggx.glsl;
 #include pbr/geometry-smith.glsl;
 
+// tone mapping modes
+#include ../../shared/shaders/tone-mapping/aces.glsl
+#include ../../shared/shaders/tone-mapping/filmic.glsl
+#include ../../shared/shaders/tone-mapping/lottes.glsl
+#include ../../shared/shaders/tone-mapping/reinhard.glsl
+#include ../../shared/shaders/tone-mapping/reinhard2.glsl
+#include ../../shared/shaders/tone-mapping/uchimura.glsl
+#include ../../shared/shaders/tone-mapping/uncharted.glsl
+#include ../../shared/shaders/tone-mapping/unreal.glsl
+
 // PBR inputs
 #ifdef USE_PBR
   uniform vec3 u_albedo;
@@ -37,11 +47,11 @@ void main () {
     
     for (int i = 0; i < POINT_LIGHTS_COUNT; i++) {
         // calculate per-light radiance
-        vec3 L = normalize(lightPositions[i] - vWorldPos);
+        vec3 L = normalize(pointLightPositions[i] - vWorldPos);
         vec3 H = normalize(V + L);
-        float distance    = length(lightPositions[i] - vWorldPos);
-        float attenuation = 20.0 / (distance * distance);
-        vec3 radiance     = lightColors[i] * attenuation;        
+        float distance    = length(pointLightPositions[i] - vWorldPos);
+        float attenuation = pointLightIntensity / (distance * distance);
+        vec3 radiance     = pointLightColors[i] * attenuation;        
         
         // cook-torrance brdf
         float NDF = DistributionGGX(N, H, u_roughness);
@@ -61,9 +71,38 @@ void main () {
         Lo += (kD * u_albedo / PI + specular) * radiance * NdotL; 
     }
 
-
-
-    Lo = Lo / (Lo + vec3(1.0));
+    // support for different tone mapping modes
+    Lo = mix(
+      aces(Lo),
+      mix(
+        tonemapFilmic(Lo),
+        mix(
+          lottes(Lo),
+          mix(
+            reinhard(Lo),
+            mix(
+              reinhard2(Lo),
+              mix(
+                uchimura(Lo),
+                mix(
+                  uncharted2(Lo),
+                  unreal(Lo),
+                  clamp(tonemappingMode, 6.0, 7.0) - 6.0
+                ),
+                clamp(tonemappingMode, 5.0, 6.0) - 5.0
+              ),
+              clamp(tonemappingMode, 4.0, 5.0) - 4.0
+            ),
+            clamp(tonemappingMode, 3.0, 4.0) - 3.0
+          ),
+          clamp(tonemappingMode, 2.0, 3.0) - 2.0
+        ),
+        clamp(tonemappingMode, 1.0, 2.0) - 1.0
+      ),
+      clamp(tonemappingMode, 0.0, 1.0)
+    );
+    
+    // gamma correction
     Lo = pow(Lo, vec3(1.0/2.2)); 
 
     // vec3 ambient = vec3(0.03) * albedo * ao;

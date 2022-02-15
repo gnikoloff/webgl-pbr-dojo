@@ -1,4 +1,4 @@
-var nt=Object.defineProperty;var W=Object.getOwnPropertySymbols;var ot=Object.prototype.hasOwnProperty,it=Object.prototype.propertyIsEnumerable;var z=(o,t,e)=>t in o?nt(o,t,{enumerable:!0,configurable:!0,writable:!0,value:e}):o[t]=e,y=(o,t)=>{for(var e in t||(t={}))ot.call(t,e)&&z(o,e,t[e]);if(W)for(var e of W(t))it.call(t,e)&&z(o,e,t[e]);return o};var j=(o,t,e)=>{if(!t.has(o))throw TypeError("Cannot "+e)};var c=(o,t,e)=>(j(o,t,"read from private field"),e?e.call(o):t.get(o)),f=(o,t,e)=>{if(t.has(o))throw TypeError("Cannot add the same private member more than once");t instanceof WeakSet?t.add(o):t.set(o,e)},h=(o,t,e,i)=>(j(o,t,"write to private field"),i?i.call(o,e):t.set(o,e),e);import{D as q,O as rt,P as at,C as st,c as ct,a as ft,S as ht,b as H,d as G,E as X}from"./assets/index.645cdd9f.js";import"./assets/vendor.032aa3bc.js";var $=`#version 300 es
+var rn=Object.defineProperty;var z=Object.getOwnPropertySymbols;var sn=Object.prototype.hasOwnProperty,ln=Object.prototype.propertyIsEnumerable;var j=(o,n,t)=>n in o?rn(o,n,{enumerable:!0,configurable:!0,writable:!0,value:t}):o[n]=t,y=(o,n)=>{for(var t in n||(n={}))sn.call(n,t)&&j(o,t,n[t]);if(z)for(var t of z(n))ln.call(n,t)&&j(o,t,n[t]);return o};var $=(o,n,t)=>{if(!n.has(o))throw TypeError("Cannot "+t)};var l=(o,n,t)=>($(o,n,"read from private field"),t?t.call(o):n.get(o)),c=(o,n,t)=>{if(n.has(o))throw TypeError("Cannot add the same private member more than once");n instanceof WeakSet?n.add(o):n.set(o,t)},f=(o,n,t,a)=>($(o,n,"write to private field"),a?a.call(o,t):n.set(o,t),t);import{t as cn}from"./assets/vendor.19aed32e.js";import{D as q,O as fn,P as dn,C as mn,c as hn,a as un,S as pn,b as G,d as k}from"./assets/index.75855a8b.js";var K=`#version 300 es
 
 -- DEFINES_HOOK --
 
@@ -16,8 +16,10 @@ uniform View {
 
 #ifdef USE_PBR
   uniform Lighting {
-    vec3 lightPositions[POINT_LIGHTS_COUNT];
-    vec3 lightColors[POINT_LIGHTS_COUNT];
+    vec3 pointLightPositions[POINT_LIGHTS_COUNT];
+    vec3 pointLightColors[POINT_LIGHTS_COUNT];
+    float pointLightIntensity;
+    float tonemappingMode;
   };
 #endif
 
@@ -35,10 +37,10 @@ void main () {
   vec4 worldPos = u_worldMatrix * aPosition;
   gl_Position = projMatrix * viewMatrix * worldPos;
 
-  vNormal = aNormal;
+  vNormal = mat3(u_worldMatrix) * aNormal;
   vUv = aUv;
   vWorldPos = worldPos.xyz;
-}`,K=`#version 300 es
+}`,J=`#version 300 es
 precision highp float;
 
 -- DEFINES_HOOK --
@@ -57,8 +59,10 @@ uniform View {
 
 #ifdef USE_PBR
   uniform Lighting {
-    vec3 lightPositions[POINT_LIGHTS_COUNT];
-    vec3 lightColors[POINT_LIGHTS_COUNT];
+    vec3 pointLightPositions[POINT_LIGHTS_COUNT];
+    vec3 pointLightColors[POINT_LIGHTS_COUNT];
+    float pointLightIntensity;
+    float tonemappingMode;
   };
 #endif
 vec3 fresnelSchlick(float cosTheta, vec3 F0) {
@@ -95,6 +99,191 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
   return ggx1 * ggx2;
 }
 
+vec3 aces(vec3 x) {
+  const float a = 2.51;
+  const float b = 0.03;
+  const float c = 2.43;
+  const float d = 0.59;
+  const float e = 0.14;
+  return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
+}
+
+float aces(float x) {
+  const float a = 2.51;
+  const float b = 0.03;
+  const float c = 2.43;
+  const float d = 0.59;
+  const float e = 0.14;
+  return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
+}
+vec3 tonemapFilmic(vec3 x) {
+  vec3 X = max(vec3(0.0), x - 0.004);
+  vec3 result = (X * (6.2 * X + 0.5)) / (X * (6.2 * X + 1.7) + 0.06);
+  return pow(result, vec3(2.2));
+}
+
+float tonemapFilmic(float x) {
+  float X = max(0.0, x - 0.004);
+  float result = (X * (6.2 * X + 0.5)) / (X * (6.2 * X + 1.7) + 0.06);
+  return pow(result, 2.2);
+}
+vec3 lottes(vec3 x) {
+  const vec3 a = vec3(1.6);
+  const vec3 d = vec3(0.977);
+  const vec3 hdrMax = vec3(8.0);
+  const vec3 midIn = vec3(0.18);
+  const vec3 midOut = vec3(0.267);
+
+  const vec3 b =
+      (-pow(midIn, a) + pow(hdrMax, a) * midOut) /
+      ((pow(hdrMax, a * d) - pow(midIn, a * d)) * midOut);
+  const vec3 c =
+      (pow(hdrMax, a * d) * pow(midIn, a) - pow(hdrMax, a) * pow(midIn, a * d) * midOut) /
+      ((pow(hdrMax, a * d) - pow(midIn, a * d)) * midOut);
+
+  return pow(x, a) / (pow(x, a * d) * b + c);
+}
+
+float lottes(float x) {
+  const float a = 1.6;
+  const float d = 0.977;
+  const float hdrMax = 8.0;
+  const float midIn = 0.18;
+  const float midOut = 0.267;
+
+  const float b =
+      (-pow(midIn, a) + pow(hdrMax, a) * midOut) /
+      ((pow(hdrMax, a * d) - pow(midIn, a * d)) * midOut);
+  const float c =
+      (pow(hdrMax, a * d) * pow(midIn, a) - pow(hdrMax, a) * pow(midIn, a * d) * midOut) /
+      ((pow(hdrMax, a * d) - pow(midIn, a * d)) * midOut);
+
+  return pow(x, a) / (pow(x, a * d) * b + c);
+}
+vec3 reinhard(vec3 x) {
+  return x / (1.0 + x);
+}
+
+float reinhard(float x) {
+  return x / (1.0 + x);
+}
+vec3 reinhard2(vec3 x) {
+  const float L_white = 4.0;
+
+  return (x * (1.0 + x / (L_white * L_white))) / (1.0 + x);
+}
+
+float reinhard2(float x) {
+  const float L_white = 4.0;
+
+  return (x * (1.0 + x / (L_white * L_white))) / (1.0 + x);
+}
+vec3 uchimura(vec3 x, float P, float a, float m, float l, float c, float b) {
+  float l0 = ((P - m) * l) / a;
+  float L0 = m - m / a;
+  float L1 = m + (1.0 - m) / a;
+  float S0 = m + l0;
+  float S1 = m + a * l0;
+  float C2 = (a * P) / (P - S1);
+  float CP = -C2 / P;
+
+  vec3 w0 = vec3(1.0 - smoothstep(0.0, m, x));
+  vec3 w2 = vec3(step(m + l0, x));
+  vec3 w1 = vec3(1.0 - w0 - w2);
+
+  vec3 T = vec3(m * pow(x / m, vec3(c)) + b);
+  vec3 S = vec3(P - (P - S1) * exp(CP * (x - S0)));
+  vec3 L = vec3(m + a * (x - m));
+
+  return T * w0 + L * w1 + S * w2;
+}
+
+vec3 uchimura(vec3 x) {
+  const float P = 1.0;  
+  const float a = 1.0;  
+  const float m = 0.22; 
+  const float l = 0.4;  
+  const float c = 1.33; 
+  const float b = 0.0;  
+
+  return uchimura(x, P, a, m, l, c, b);
+}
+
+float uchimura(float x, float P, float a, float m, float l, float c, float b) {
+  float l0 = ((P - m) * l) / a;
+  float L0 = m - m / a;
+  float L1 = m + (1.0 - m) / a;
+  float S0 = m + l0;
+  float S1 = m + a * l0;
+  float C2 = (a * P) / (P - S1);
+  float CP = -C2 / P;
+
+  float w0 = 1.0 - smoothstep(0.0, m, x);
+  float w2 = step(m + l0, x);
+  float w1 = 1.0 - w0 - w2;
+
+  float T = m * pow(x / m, c) + b;
+  float S = P - (P - S1) * exp(CP * (x - S0));
+  float L = m + a * (x - m);
+
+  return T * w0 + L * w1 + S * w2;
+}
+
+float uchimura(float x) {
+  const float P = 1.0;  
+  const float a = 1.0;  
+  const float m = 0.22; 
+  const float l = 0.4;  
+  const float c = 1.33; 
+  const float b = 0.0;  
+
+  return uchimura(x, P, a, m, l, c, b);
+}
+vec3 uncharted2Tonemap(vec3 x) {
+  float A = 0.15;
+  float B = 0.50;
+  float C = 0.10;
+  float D = 0.20;
+  float E = 0.02;
+  float F = 0.30;
+  float W = 11.2;
+  return ((x * (A * x + C * B) + D * E) / (x * (A * x + B) + D * F)) - E / F;
+}
+
+vec3 uncharted2(vec3 color) {
+  const float W = 11.2;
+  float exposureBias = 2.0;
+  vec3 curr = uncharted2Tonemap(exposureBias * color);
+  vec3 whiteScale = 1.0 / uncharted2Tonemap(vec3(W));
+  return curr * whiteScale;
+}
+
+float uncharted2Tonemap(float x) {
+  float A = 0.15;
+  float B = 0.50;
+  float C = 0.10;
+  float D = 0.20;
+  float E = 0.02;
+  float F = 0.30;
+  float W = 11.2;
+  return ((x * (A * x + C * B) + D * E) / (x * (A * x + B) + D * F)) - E / F;
+}
+
+float uncharted2(float color) {
+  const float W = 11.2;
+  const float exposureBias = 2.0;
+  float curr = uncharted2Tonemap(exposureBias * color);
+  float whiteScale = 1.0 / uncharted2Tonemap(W);
+  return curr * whiteScale;
+}
+vec3 unreal(vec3 x) {
+  return x / (x + 0.155) * 1.019;
+}
+
+float unreal(float x) {
+  return x / (x + 0.155) * 1.019;
+}
+
 #ifdef USE_PBR
   uniform vec3 u_albedo;
   uniform float u_metallic;
@@ -123,11 +312,11 @@ void main () {
     
     for (int i = 0; i < POINT_LIGHTS_COUNT; i++) {
         
-        vec3 L = normalize(lightPositions[i] - vWorldPos);
+        vec3 L = normalize(pointLightPositions[i] - vWorldPos);
         vec3 H = normalize(V + L);
-        float distance    = length(lightPositions[i] - vWorldPos);
-        float attenuation = 20.0 / (distance * distance);
-        vec3 radiance     = lightColors[i] * attenuation;        
+        float distance    = length(pointLightPositions[i] - vWorldPos);
+        float attenuation = pointLightIntensity / (distance * distance);
+        vec3 radiance     = pointLightColors[i] * attenuation;        
         
         
         float NDF = DistributionGGX(N, H, u_roughness);
@@ -147,7 +336,38 @@ void main () {
         Lo += (kD * u_albedo / PI + specular) * radiance * NdotL; 
     }
 
-    Lo = Lo / (Lo + vec3(1.0));
+    
+    Lo = mix(
+      aces(Lo),
+      mix(
+        tonemapFilmic(Lo),
+        mix(
+          lottes(Lo),
+          mix(
+            reinhard(Lo),
+            mix(
+              reinhard2(Lo),
+              mix(
+                uchimura(Lo),
+                mix(
+                  uncharted2(Lo),
+                  unreal(Lo),
+                  clamp(tonemappingMode, 6.0, 7.0) - 6.0
+                ),
+                clamp(tonemappingMode, 5.0, 6.0) - 5.0
+              ),
+              clamp(tonemappingMode, 4.0, 5.0) - 4.0
+            ),
+            clamp(tonemappingMode, 3.0, 4.0) - 3.0
+          ),
+          clamp(tonemappingMode, 2.0, 3.0) - 2.0
+        ),
+        clamp(tonemappingMode, 1.0, 2.0) - 1.0
+      ),
+      clamp(tonemappingMode, 0.0, 1.0)
+    );
+    
+    
     Lo = pow(Lo, vec3(1.0/2.2)); 
 
     
@@ -160,4 +380,4 @@ void main () {
   
 
   #endif
-}`,N,x,g;class lt extends q{constructor(t,e,i){super(t,$,K,y({USE_PBR:!0,PI:Math.PI},i),"sphere");f(this,N,void 0);f(this,x,void 0);f(this,g,void 0);const{vertexCount:s,vertexStride:a,interleavedArray:u,indicesArray:T}=e;this.vertexCount=s;const m=t.getAttribLocation(this.program,"aPosition"),F=t.getAttribLocation(this.program,"aNormal"),R=t.getAttribLocation(this.program,"aUv"),w=t.createBuffer(),M=t.createBuffer();this.gl.bindVertexArray(this.vao),t.bindBuffer(t.ARRAY_BUFFER,w),t.bufferData(t.ARRAY_BUFFER,u,t.STATIC_DRAW),t.enableVertexAttribArray(m),t.vertexAttribPointer(m,3,t.FLOAT,!1,a*Float32Array.BYTES_PER_ELEMENT,0*Float32Array.BYTES_PER_ELEMENT),t.enableVertexAttribArray(F),t.vertexAttribPointer(F,3,t.FLOAT,!1,a*Float32Array.BYTES_PER_ELEMENT,3*Float32Array.BYTES_PER_ELEMENT),t.enableVertexAttribArray(R),t.vertexAttribPointer(R,2,t.FLOAT,!1,a*Float32Array.BYTES_PER_ELEMENT,6*Float32Array.BYTES_PER_ELEMENT),t.bindBuffer(t.ELEMENT_ARRAY_BUFFER,M),t.bufferData(t.ELEMENT_ARRAY_BUFFER,T,t.STATIC_DRAW),this.gl.bindVertexArray(null),this.updateUniform("u_worldMatrix",this.worldMatrix),this.setUniform("u_albedo",{type:t.FLOAT_VEC3,value:new Float32Array([1,0,0])}),h(this,N,t.getUniformBlockIndex(this.program,"Projection")),h(this,x,t.getUniformBlockIndex(this.program,"View")),h(this,g,t.getUniformBlockIndex(this.program,"Lighting"))}render(){this.gl.uniformBlockBinding(this.program,c(this,N),0),this.gl.uniformBlockBinding(this.program,c(this,x),1),this.gl.uniformBlockBinding(this.program,c(this,g),2),this.gl.useProgram(this.program),this.gl.bindVertexArray(this.vao),this.gl.drawElements(this.gl.TRIANGLES,this.vertexCount,this.gl.UNSIGNED_SHORT,0),this.gl.bindVertexArray(null)}}N=new WeakMap,x=new WeakMap,g=new WeakMap;var _,A,P;const Y=class extends q{constructor(t,e,i,s){super(t,$,K,y({PI:Math.PI,USE_DIFFUSE_ONLY:!0},s));f(this,_,void 0);f(this,A,void 0);f(this,P,void 0);const{vertexCount:a,vertexStride:u,interleavedArray:T,indicesArray:m}=i;this.vertexCount=a;const F=t.getAttribLocation(this.program,"aPosition"),R=t.getAttribLocation(this.program,"aUv"),w=t.createBuffer(),M=t.createBuffer();this.gl.bindVertexArray(this.vao),t.bindBuffer(t.ARRAY_BUFFER,w),t.bufferData(t.ARRAY_BUFFER,T,t.STATIC_DRAW),t.enableVertexAttribArray(F),t.vertexAttribPointer(F,3,t.FLOAT,!1,u*Float32Array.BYTES_PER_ELEMENT,0*Float32Array.BYTES_PER_ELEMENT),t.enableVertexAttribArray(R),t.vertexAttribPointer(R,2,t.FLOAT,!1,u*Float32Array.BYTES_PER_ELEMENT,3*Float32Array.BYTES_PER_ELEMENT),t.bindBuffer(t.ELEMENT_ARRAY_BUFFER,M),t.bufferData(t.ELEMENT_ARRAY_BUFFER,m,t.STATIC_DRAW),this.gl.bindVertexArray(null),this.updateUniform("u_worldMatrix",this.worldMatrix),this.setUniform("u_diffuse",{type:t.INT,value:0});const O=Y.createTextCanvas(e);h(this,_,t.createTexture()),t.bindTexture(t.TEXTURE_2D,c(this,_)),t.texImage2D(t.TEXTURE_2D,0,t.RGBA,O.width,O.height,0,t.RGBA,t.UNSIGNED_BYTE,O),t.generateMipmap(t.TEXTURE_2D),t.bindTexture(t.TEXTURE_2D,null),h(this,A,t.getUniformBlockIndex(this.program,"Projection")),h(this,P,t.getUniformBlockIndex(this.program,"View"))}static createTextCanvas(t){const e=document.createElement("canvas"),i=e.getContext("2d");e.width=1024,e.height=128;const s=20,a=10,u=100;i.font=`${u}px Helvetica`,i.fillStyle="#fff",i.textBaseline="middle",i.fillText(t,s,e.height/2);const{width:T}=i.measureText(t),m=s+T+40;return i.strokeStyle="#fff",i.lineWidth=5,i.beginPath(),i.moveTo(m,e.height/2),i.lineTo(e.width-a,e.height/2),i.stroke(),i.beginPath(),i.moveTo(e.width-a,e.height/2),i.lineTo(e.width-a-40,e.height/2+30),i.stroke(),i.beginPath(),i.moveTo(e.width-a,e.height/2),i.lineTo(e.width-a-40,e.height/2-30),i.stroke(),e}render(){this.gl.uniformBlockBinding(this.program,c(this,A),0),this.gl.uniformBlockBinding(this.program,c(this,P),1),this.gl.useProgram(this.program),this.gl.bindVertexArray(this.vao),this.gl.activeTexture(this.gl.TEXTURE0),this.gl.bindTexture(this.gl.TEXTURE_2D,c(this,_)),this.gl.drawElements(this.gl.TRIANGLES,this.vertexCount,this.gl.UNSIGNED_SHORT,0),this.gl.bindVertexArray(null)}};let V=Y;_=new WeakMap,A=new WeakMap,P=new WeakMap;const U=7,C=7,I=10,L=10,S=4,l=document.createElement("canvas");document.body.appendChild(l);const n=l.getContext("webgl2"),k=new rt(-innerWidth/2,innerWidth/2,innerHeight/2,-innerHeight/2,0,2);k.position=[0,0,1];k.lookAt=[0,0,0];k.updateProjectionViewMatrix();const r=new at(45*Math.PI/180,innerWidth/innerHeight,.1,100);r.position=[5.43,.2,14.06];r.lookAt=[0,0,0];r.updateProjectionMatrix();new st(r,l,!1);const D=ct({radius:.5,widthSegments:32,heightSegments:32}),v=ft({width:5,height:5/8}),d=new ht,dt={POINT_LIGHTS_COUNT:S.toString()},ut=I/U,mt=L/C;for(let o=0;o<C;o++)for(let t=0;t<U;t++){const e=new lt(n,D,dt);e.setPosition([t*ut-I/2+D.radius,o*mt-L/2+D.radius,0]);const i=X.quad_In(o/C);e.setUniform("u_metallic",{type:n.FLOAT,value:i});const s=1/U+X.quad_In(t/U);e.setUniform("u_roughness",{type:n.FLOAT,value:s}),d.addChild(e)}const J=new V(n,"roughness",v);J.setPosition([-I/2+v.width/2,-L/2-v.height,0]);d.addChild(J);const Q=new V(n,"metallic",v);Q.setPosition([-I/2-v.height,-L/2+v.width/2,0]).setRotation([0,0,Math.PI*.5]);d.addChild(Q);const B=H(n,d.children[0].program,"Projection",["projMatrix","zNear","zFar"]),Et=G(n,B.blockSize,0),p=H(n,d.children[0].program,"View",["viewMatrix","cameraPosition","time"]),_t=G(n,p.blockSize,1),b=H(n,d.children[0].program,"Lighting",["lightPositions","lightColors"]),vt=G(n,b.blockSize,2),E=[],Z=[];for(let o=0;o<S;o++)E.push(new Float32Array(3)),Z.push(new Float32Array([Math.random(),Math.random(),Math.random()]));console.log(E);requestAnimationFrame(tt);et();window.addEventListener("resize",et);function tt(o){requestAnimationFrame(tt),r.updateViewMatrix(),n.bindBuffer(n.UNIFORM_BUFFER,Et),n.bufferSubData(n.UNIFORM_BUFFER,B.uniforms.projMatrix.offset,r.projectionMatrix,0),n.bufferSubData(n.UNIFORM_BUFFER,B.uniforms.zNear.offset,new Float32Array([r.near]),0),n.bufferSubData(n.UNIFORM_BUFFER,B.uniforms.zFar.offset,new Float32Array([r.far]),0),n.bindBuffer(n.UNIFORM_BUFFER,_t),n.bufferSubData(n.UNIFORM_BUFFER,p.uniforms.viewMatrix.offset,r.viewMatrix,0),n.bufferSubData(n.UNIFORM_BUFFER,p.uniforms.cameraPosition.offset,new Float32Array(r.position),0),n.bufferSubData(n.UNIFORM_BUFFER,p.uniforms.time.offset,new Float32Array([o]),0),n.bindBuffer(n.UNIFORM_BUFFER,vt);const t=o*.001;for(let e=0;e<S;e++){const i=Math.PI*2/S;E[e][0]=Math.cos(e*i+t)*10,E[e][1]=Math.sin(e*i+t)*10,E[e][2]=Math.cos(t)+2+4,n.bufferSubData(n.UNIFORM_BUFFER,b.uniforms.lightPositions.offset+e*b.uniforms.lightPositions.size*Float32Array.BYTES_PER_ELEMENT,E[e],0),n.bufferSubData(n.UNIFORM_BUFFER,b.uniforms.lightColors.offset+e*4*Float32Array.BYTES_PER_ELEMENT,Z[e],0)}n.enable(n.DEPTH_TEST),n.enable(n.BLEND),n.blendFunc(n.SRC_ALPHA,n.ONE_MINUS_SRC_ALPHA),n.viewport(0,0,n.drawingBufferWidth,n.drawingBufferHeight),n.clearColor(.1,.1,.1,1),n.clear(n.COLOR_BUFFER_BIT|n.DEPTH_BUFFER_BIT),d.updateWorldMatrix().render()}function et(){r.aspect=innerWidth/innerHeight,r.updateProjectionMatrix(),l.width=innerWidth*devicePixelRatio,l.height=innerHeight*devicePixelRatio,l.style.setProperty("width",`${innerWidth}px`),l.style.setProperty("height",`${innerHeight}px`)}
+}`,P,T,g;class xn extends q{constructor(n,t,a){super(n,K,J,y({USE_PBR:!0,PI:Math.PI},a),"sphere");c(this,P,void 0);c(this,T,void 0);c(this,g,void 0);const{vertexCount:s,vertexStride:r,interleavedArray:h,indicesArray:_}=t;this.vertexCount=s;const u=n.getAttribLocation(this.program,"aPosition"),w=n.getAttribLocation(this.program,"aNormal"),F=n.getAttribLocation(this.program,"aUv"),I=n.createBuffer(),M=n.createBuffer();this.gl.bindVertexArray(this.vao),n.bindBuffer(n.ARRAY_BUFFER,I),n.bufferData(n.ARRAY_BUFFER,h,n.STATIC_DRAW),n.enableVertexAttribArray(u),n.vertexAttribPointer(u,3,n.FLOAT,!1,r*Float32Array.BYTES_PER_ELEMENT,0*Float32Array.BYTES_PER_ELEMENT),n.enableVertexAttribArray(w),n.vertexAttribPointer(w,3,n.FLOAT,!1,r*Float32Array.BYTES_PER_ELEMENT,3*Float32Array.BYTES_PER_ELEMENT),n.enableVertexAttribArray(F),n.vertexAttribPointer(F,2,n.FLOAT,!1,r*Float32Array.BYTES_PER_ELEMENT,6*Float32Array.BYTES_PER_ELEMENT),n.bindBuffer(n.ELEMENT_ARRAY_BUFFER,M),n.bufferData(n.ELEMENT_ARRAY_BUFFER,_,n.STATIC_DRAW),this.gl.bindVertexArray(null),this.updateUniform("u_worldMatrix",this.worldMatrix),this.setUniform("u_albedo",{type:n.FLOAT_VEC3,value:new Float32Array([1,0,0])}),f(this,P,n.getUniformBlockIndex(this.program,"Projection")),f(this,T,n.getUniformBlockIndex(this.program,"View")),f(this,g,n.getUniformBlockIndex(this.program,"Lighting"))}render(){this.gl.uniformBlockBinding(this.program,l(this,P),0),this.gl.uniformBlockBinding(this.program,l(this,T),1),this.gl.uniformBlockBinding(this.program,l(this,g),2),this.gl.useProgram(this.program),this.gl.bindVertexArray(this.vao),this.gl.drawElements(this.gl.TRIANGLES,this.vertexCount,this.gl.UNSIGNED_SHORT,0),this.gl.bindVertexArray(null)}}P=new WeakMap,T=new WeakMap,g=new WeakMap;var v,L,b;const X=class extends q{constructor(n,t,a,s){super(n,K,J,y({PI:Math.PI,USE_DIFFUSE_ONLY:!0},s));c(this,v,void 0);c(this,L,void 0);c(this,b,void 0);const{vertexCount:r,vertexStride:h,interleavedArray:_,indicesArray:u}=a;this.vertexCount=r;const w=n.getAttribLocation(this.program,"aPosition"),F=n.getAttribLocation(this.program,"aUv"),I=n.createBuffer(),M=n.createBuffer();this.gl.bindVertexArray(this.vao),n.bindBuffer(n.ARRAY_BUFFER,I),n.bufferData(n.ARRAY_BUFFER,_,n.STATIC_DRAW),n.enableVertexAttribArray(w),n.vertexAttribPointer(w,3,n.FLOAT,!1,h*Float32Array.BYTES_PER_ELEMENT,0*Float32Array.BYTES_PER_ELEMENT),n.enableVertexAttribArray(F),n.vertexAttribPointer(F,2,n.FLOAT,!1,h*Float32Array.BYTES_PER_ELEMENT,3*Float32Array.BYTES_PER_ELEMENT),n.bindBuffer(n.ELEMENT_ARRAY_BUFFER,M),n.bufferData(n.ELEMENT_ARRAY_BUFFER,u,n.STATIC_DRAW),this.gl.bindVertexArray(null),this.updateUniform("u_worldMatrix",this.worldMatrix),this.setUniform("u_diffuse",{type:n.INT,value:0});const O=X.createTextCanvas(t);f(this,v,n.createTexture()),n.bindTexture(n.TEXTURE_2D,l(this,v)),n.texImage2D(n.TEXTURE_2D,0,n.RGBA,O.width,O.height,0,n.RGBA,n.UNSIGNED_BYTE,O),n.generateMipmap(n.TEXTURE_2D),n.bindTexture(n.TEXTURE_2D,null),f(this,L,n.getUniformBlockIndex(this.program,"Projection")),f(this,b,n.getUniformBlockIndex(this.program,"View"))}static createTextCanvas(n){const t=document.createElement("canvas"),a=t.getContext("2d");t.width=1024,t.height=128;const s=20,r=10,h=100;a.font=`${h}px Helvetica`,a.fillStyle="#fff",a.textBaseline="middle",a.fillText(n,s,t.height/2);const{width:_}=a.measureText(n),u=s+_+40;return a.strokeStyle="#fff",a.lineWidth=5,a.beginPath(),a.moveTo(u,t.height/2),a.lineTo(t.width-r,t.height/2),a.stroke(),a.beginPath(),a.moveTo(t.width-r,t.height/2),a.lineTo(t.width-r-40,t.height/2+30),a.stroke(),a.beginPath(),a.moveTo(t.width-r,t.height/2),a.lineTo(t.width-r-40,t.height/2-30),a.stroke(),t}render(){this.gl.uniformBlockBinding(this.program,l(this,L),0),this.gl.uniformBlockBinding(this.program,l(this,b),1),this.gl.useProgram(this.program),this.gl.bindVertexArray(this.vao),this.gl.activeTexture(this.gl.TEXTURE0),this.gl.bindTexture(this.gl.TEXTURE_2D,l(this,v)),this.gl.drawElements(this.gl.TRIANGLES,this.vertexCount,this.gl.UNSIGNED_SHORT,0),this.gl.bindVertexArray(null)}};let V=X;v=new WeakMap,L=new WeakMap,b=new WeakMap;const A=7,H=7,B=10,U=10,N=4,C=["aces","filmic","lottes","reinhard","reinhard2","uchimura","uncharted","unreal"],Q=new Float32Array([2]),Z=new Float32Array([40]),W=new cn.exports.Pane;W.element.parentNode.style.setProperty("width","340px");W.addBlade({view:"list",label:"tone mapping mode",options:C.map(o=>({text:o,value:o})),value:C[2]}).on("change",({value:o})=>{Q[0]=C.indexOf(o)});W.addBlade({view:"slider",label:"point light luminance",min:0,max:50,value:20}).on("change",({value:o})=>{Z[0]=o});const d=document.createElement("canvas");document.body.appendChild(d);const e=d.getContext("webgl2"),Y=new fn(-innerWidth/2,innerWidth/2,innerHeight/2,-innerHeight/2,0,2);Y.position=[0,0,1];Y.lookAt=[0,0,0];Y.updateProjectionViewMatrix();const i=new dn(45*Math.PI/180,innerWidth/innerHeight,.1,100);i.position=[5.43,.2,14.06];i.lookAt=[0,0,0];i.updateProjectionMatrix();new mn(i,d,!1);const D=hn({radius:.5,widthSegments:32,heightSegments:32}),E=un({width:5,height:5/8}),m=new pn,vn={POINT_LIGHTS_COUNT:N.toString()},En=B/A,_n=U/H;for(let o=0;o<H;o++)for(let n=0;n<A;n++){const t=new xn(e,D,vn);t.setPosition([n*En-B/2+D.radius,o*_n-U/2+D.radius,0]);const a=o/H;t.setUniform("u_metallic",{type:e.FLOAT,value:a});const s=1/A+n/A;t.setUniform("u_roughness",{type:e.FLOAT,value:s}),m.addChild(t)}const nn=new V(e,"roughness",E);nn.setPosition([-B/2+E.width/2,-U/2-E.height,0]);m.addChild(nn);const tn=new V(e,"metallic",E);tn.setPosition([-B/2-E.height,-U/2+E.width/2,0]).setRotation([0,0,Math.PI*.5]);m.addChild(tn);const R=G(e,m.children[0].program,"Projection",["projMatrix","zNear","zFar"]),wn=k(e,R.blockSize,0),S=G(e,m.children[0].program,"View",["viewMatrix","cameraPosition","time"]),Fn=k(e,S.blockSize,1),p=G(e,m.children[0].program,"Lighting",["pointLightPositions","pointLightColors","pointLightIntensity","tonemappingMode"]),Pn=k(e,p.blockSize,2),x=[],en=[];for(let o=0;o<N;o++)x.push(new Float32Array(3)),en.push(new Float32Array([Math.random(),Math.random(),Math.random()]));console.log(x);requestAnimationFrame(on);an();window.addEventListener("resize",an);function on(o){requestAnimationFrame(on),i.updateViewMatrix(),e.bindBuffer(e.UNIFORM_BUFFER,wn),e.bufferSubData(e.UNIFORM_BUFFER,R.uniforms.projMatrix.offset,i.projectionMatrix,0),e.bufferSubData(e.UNIFORM_BUFFER,R.uniforms.zNear.offset,new Float32Array([i.near]),0),e.bufferSubData(e.UNIFORM_BUFFER,R.uniforms.zFar.offset,new Float32Array([i.far]),0),e.bindBuffer(e.UNIFORM_BUFFER,Fn),e.bufferSubData(e.UNIFORM_BUFFER,S.uniforms.viewMatrix.offset,i.viewMatrix,0),e.bufferSubData(e.UNIFORM_BUFFER,S.uniforms.cameraPosition.offset,new Float32Array(i.position),0),e.bufferSubData(e.UNIFORM_BUFFER,S.uniforms.time.offset,new Float32Array([o]),0),e.bindBuffer(e.UNIFORM_BUFFER,Pn);const n=o*.001;for(let t=0;t<N;t++){const a=Math.PI*2/N;x[t][0]=Math.cos(t*a+n)*10,x[t][1]=Math.sin(t*a+n)*10,x[t][2]=Math.cos(n)+2+4,e.bufferSubData(e.UNIFORM_BUFFER,p.uniforms.pointLightPositions.offset+t*p.uniforms.pointLightPositions.size*Float32Array.BYTES_PER_ELEMENT,x[t],0),e.bufferSubData(e.UNIFORM_BUFFER,p.uniforms.pointLightColors.offset+t*4*Float32Array.BYTES_PER_ELEMENT,en[t],0)}e.bufferSubData(e.UNIFORM_BUFFER,p.uniforms.tonemappingMode.offset,Q,0),e.bufferSubData(e.UNIFORM_BUFFER,p.uniforms.pointLightIntensity.offset,Z,0),e.enable(e.DEPTH_TEST),e.enable(e.BLEND),e.blendFunc(e.SRC_ALPHA,e.ONE_MINUS_SRC_ALPHA),e.viewport(0,0,e.drawingBufferWidth,e.drawingBufferHeight),e.clearColor(.1,.1,.1,1),e.clear(e.COLOR_BUFFER_BIT|e.DEPTH_BUFFER_BIT),m.updateWorldMatrix().render()}function an(){i.aspect=innerWidth/innerHeight,i.updateProjectionMatrix(),d.width=innerWidth*devicePixelRatio,d.height=innerHeight*devicePixelRatio,d.style.setProperty("width",`${innerWidth}px`),d.style.setProperty("height",`${innerHeight}px`)}

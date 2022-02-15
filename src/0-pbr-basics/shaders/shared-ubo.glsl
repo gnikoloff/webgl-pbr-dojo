@@ -12,7 +12,9 @@ uniform View {
 
 #ifdef USE_PBR
   uniform Lighting {
-    vec3 lightPositions[POINT_LIGHTS_COUNT];
-    vec3 lightColors[POINT_LIGHTS_COUNT];
+    vec3 pointLightPositions[POINT_LIGHTS_COUNT];
+    vec3 pointLightColors[POINT_LIGHTS_COUNT];
+    float pointLightIntensity;
+    float tonemappingMode;
   };
 #endif
