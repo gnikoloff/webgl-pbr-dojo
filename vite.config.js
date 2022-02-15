@@ -6,6 +6,7 @@ export default ({ mode }) => {
 
   return defineConfig({
     plugins: [glsl()],
+    assetsInclude: ['**/*.hdr'],
     build: {
       assetsInlineLimit: 0,
       outDir: 'site/assets/',

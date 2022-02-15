@@ -9,8 +9,7 @@ import {
   SceneNode,
   OrthographicCamera,
   createPlane,
-} from '../lib/hwoa-rang-gl2/dist'
-import { Easing } from '../lib/hwoa-rangtween/dist'
+} from '../lib/hwoa-rang-gl2'
 
 import Sphere from './sphere'
 import Label from './label'
@@ -245,6 +244,20 @@ for (let i = 0; i < POINT_LIGHT_POSITIONS_COUNT; i++) {
   pointLightsColors.push(new Float32Array([1, 1, 1]))
 }
 
+const $loader = document.createElement('div')
+$loader.setAttribute(
+  'style',
+  `
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  color: white;
+  font-family: monospace;
+`,
+)
+$loader.textContent = 'Loading assets...'
+document.body.appendChild($loader)
+
 Promise.all([
   Promise.all(
     PBR_TEXTURES_0.map((imageURL, i) =>
@@ -270,6 +283,7 @@ Promise.all([
       texIdx = 0
     }
   })
+  $loader.parentNode.removeChild($loader)
 })
 // .then((textures) => {
 
@@ -386,14 +400,6 @@ function drawFrame(ts) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   scene.updateWorldMatrix().render()
-
-  // gl.bindFramebuffer(gl.FRAMEBUFFER, null)
-
-  // gl.activeTexture(gl.TEXTURE0)
-  // gl.bindTexture(gl.TEXTURE_2D, hdrTexture)
-  // fsQuad.render()
-
-  // gl.bindTexture(gl.TEXTURE_2D, null)
 }
 
 function loadGLTextureFromImage(imageSrc, format = gl.RGB) {
@@ -414,6 +420,8 @@ function loadGLTextureFromImage(imageSrc, format = gl.RGB) {
         image,
       )
       gl.generateMipmap(gl.TEXTURE_2D)
+
+      gl.bindTexture(gl.TEXTURE_2D, null)
       resolve(texture)
     }
     image.onerror = (err) => reject(err)

@@ -9,8 +9,7 @@ import {
   SceneNode,
   OrthographicCamera,
   createPlane,
-} from '../lib/hwoa-rang-gl2/dist'
-import { Easing } from '../lib/hwoa-rangtween/dist'
+} from '../lib/hwoa-rang-gl2'
 
 import Sphere from './sphere'
 import Label from './label'
