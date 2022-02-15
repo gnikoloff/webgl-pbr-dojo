@@ -7,8 +7,8 @@ import {
   SceneNode,
   OrthographicCamera,
   createPlane,
-} from './lib/hwoa-rang-gl2'
-import { Easing } from './lib/hwoa-rangtween'
+} from '../lib/hwoa-rang-gl2/dist'
+import { Easing } from '../lib/hwoa-rangtween/dist'
 
 const SPHERE_GRID_X_COUNT = 7
 const SPHERE_GRID_Y_COUNT = 7

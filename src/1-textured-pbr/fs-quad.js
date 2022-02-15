@@ -1,4 +1,4 @@
-import { Drawable } from './lib/hwoa-rang-gl2/dist'
+import { Drawable } from '../lib/hwoa-rang-gl2/dist'
 
 const VS = `#version 300 es
   uniform mat4 projectionViewMatrix;

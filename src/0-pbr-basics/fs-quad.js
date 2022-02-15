@@ -1,33 +1,39 @@
-import { createProgram, Drawable } from './lib/hwoa-rang-gl2'
+import { Drawable } from '../lib/hwoa-rang-gl2/dist'
 
-import UBER_SHADER_VERT from './shaders/uberShader.vert'
-import UBER_SHADER_FRAG from './shaders/uberShader.frag'
+const VS = `#version 300 es
+  uniform mat4 projectionViewMatrix;
+  uniform mat4 u_worldMatrix;
+  in vec4 aPosition;
+  in vec2 aUv;
+  out vec2 vUv;
+  void main () {
+    gl_Position = projectionViewMatrix * u_worldMatrix * aPosition;
+    vUv = aUv;
+  }
+`
 
-export default class Sphere extends Drawable {
-  #projectionUBOIndex
-  #viewUBOIndex
-  #lightingUBOIndex
+const FS = `#version 300 es
+  precision highp float;
+  uniform sampler2D u_diffuse;
+  in vec2 vUv;
+  out vec4 finalColor;
+  void main () {
+    vec4 diffuseColor = texture(u_diffuse, vUv);
+    diffuseColor.rgb = diffuseColor.rgb / (diffuseColor.rgb + vec3(1.0));
+    diffuseColor.rgb = pow(diffuseColor.rgb, vec3(1.0/2.2)); 
+    finalColor = diffuseColor;
+  }
+`
 
+export default class FullscreenQuad extends Drawable {
   constructor(gl, geometry, defines) {
-    super(
-      gl,
-      UBER_SHADER_VERT,
-      UBER_SHADER_FRAG,
-      {
-        USE_PBR: true,
-        PI: Math.PI,
-        ...defines,
-      },
-      'sphere',
-    )
-
+    super(gl, VS, FS, defines)
     const { vertexCount, vertexStride, interleavedArray, indicesArray } =
       geometry
 
     this.vertexCount = vertexCount
 
     const aPosition = gl.getAttribLocation(this.program, 'aPosition')
-    const aNormal = gl.getAttribLocation(this.program, 'aNormal')
     const aUv = gl.getAttribLocation(this.program, 'aUv')
 
     const interleavedBuffer = gl.createBuffer()
@@ -48,16 +54,6 @@ export default class Sphere extends Drawable {
       0 * Float32Array.BYTES_PER_ELEMENT,
     )
 
-    gl.enableVertexAttribArray(aNormal)
-    gl.vertexAttribPointer(
-      aNormal,
-      3,
-      gl.FLOAT,
-      false,
-      vertexStride * Float32Array.BYTES_PER_ELEMENT,
-      3 * Float32Array.BYTES_PER_ELEMENT,
-    )
-
     gl.enableVertexAttribArray(aUv)
     gl.vertexAttribPointer(
       aUv,
@@ -65,7 +61,7 @@ export default class Sphere extends Drawable {
       gl.FLOAT,
       false,
       vertexStride * Float32Array.BYTES_PER_ELEMENT,
-      6 * Float32Array.BYTES_PER_ELEMENT,
+      3 * Float32Array.BYTES_PER_ELEMENT,
     )
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer)
@@ -74,23 +70,13 @@ export default class Sphere extends Drawable {
     this.gl.bindVertexArray(null)
 
     this.updateUniform('u_worldMatrix', this.worldMatrix)
-    this.setUniform('u_albedo', {
-      type: gl.FLOAT_VEC3,
-      value: new Float32Array([1, 0, 0]),
+    this.setUniform('u_diffuse', {
+      type: gl.INT,
+      value: 0,
     })
-
-    this.#projectionUBOIndex = gl.getUniformBlockIndex(
-      this.program,
-      'Projection',
-    )
-    this.#viewUBOIndex = gl.getUniformBlockIndex(this.program, 'View')
-    this.#lightingUBOIndex = gl.getUniformBlockIndex(this.program, 'Lighting')
   }
 
   render() {
-    this.gl.uniformBlockBinding(this.program, this.#projectionUBOIndex, 0)
-    this.gl.uniformBlockBinding(this.program, this.#viewUBOIndex, 1)
-    this.gl.uniformBlockBinding(this.program, this.#lightingUBOIndex, 2)
     this.gl.useProgram(this.program)
     this.gl.bindVertexArray(this.vao)
     this.gl.drawElements(

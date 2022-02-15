@@ -1,4 +1,4 @@
-import { Drawable } from './lib/hwoa-rang-gl2/dist'
+import { Drawable } from '../lib/hwoa-rang-gl2/dist'
 
 import UBER_SHADER_VERT from './shaders/uberShader.vert'
 import UBER_SHADER_FRAG from './shaders/uberShader.frag'

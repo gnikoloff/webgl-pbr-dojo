@@ -11,12 +11,17 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "clean:docs": "del docs",
+    "out:docs": "npx eleventy --config=./eleventy.js --serve",
+    "serve:docs": "run-s build clean:docs out:docs"
   },
   "devDependencies": {
     "eslint": "^8.8.0",
+    "npm-run-all": "^4.1.5",
     "prettier": "^2.5.1",
     "vite": "^2.8.0",
-    "vite-plugin-glsl": "^0.0.9"
+    "vite-plugin-glsl": "^0.0.9",
+    "del-cli": "^4.0.1"
   }
 }
