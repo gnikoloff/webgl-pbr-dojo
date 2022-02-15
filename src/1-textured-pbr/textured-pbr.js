@@ -247,13 +247,19 @@ for (let i = 0; i < POINT_LIGHT_POSITIONS_COUNT; i++) {
 
 Promise.all([
   Promise.all(
-    PBR_TEXTURES_0.map((imageURL) => loadGLTextureFromImage(imageURL, gl.RGB)),
+    PBR_TEXTURES_0.map((imageURL, i) =>
+      loadGLTextureFromImage(imageURL, i === 0 ? gl.SRGBA : gl.RGB),
+    ),
   ),
   Promise.all(
-    PBR_TEXTURES_1.map((imageURL) => loadGLTextureFromImage(imageURL, gl.RGB)),
+    PBR_TEXTURES_1.map((imageURL, i) =>
+      loadGLTextureFromImage(imageURL, i === 0 ? gl.SRGBA : gl.RGB),
+    ),
   ),
   Promise.all(
-    PBR_TEXTURES_2.map((imageURL) => loadGLTextureFromImage(imageURL, gl.RGB)),
+    PBR_TEXTURES_2.map((imageURL, i) =>
+      loadGLTextureFromImage(imageURL, i === 0 ? gl.SRGBA : gl.RGB),
+    ),
   ),
 ]).then((texturePacks) => {
   let texIdx = 0

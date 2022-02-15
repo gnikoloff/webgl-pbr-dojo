@@ -44,12 +44,9 @@ void main () {
   
 
   #ifdef USE_PBR
-    vec3 N = normalize(vNormal);
     vec3 V = normalize(cameraPosition - vWorldPos);
-// vec3 getNormalFromMap(sampler2D normalMap, vec2 uv, vec3 normal) {
-    N = getNormalFromMap(u_normalMap, vUv, N, vWorldPos);
-    // vec3 albedo = texture(u_albedoMap, vUv).rgb;
-    vec3 albedo = pow(texture(u_albedoMap, vUv).rgb, vec3(2.2));
+    vec3 N = getNormalFromMap(u_normalMap, vUv, normalize(vNormal), vWorldPos);
+    vec3 albedo = texture(u_albedoMap, vUv).rgb;
     float metallic = texture(u_metallicMap, vUv).r;
     float roughness = texture(u_roughnessMap, vUv).r;
     float ao = texture(u_aoMap, vUv).r;
