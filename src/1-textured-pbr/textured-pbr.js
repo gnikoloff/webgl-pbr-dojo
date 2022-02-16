@@ -20,11 +20,11 @@ import metallicMap0 from '../images/vintage/vintage-tile1_metallic-min.png'
 import normalMap0 from '../images/vintage/vintage-tile1_normal-ogl-min.png'
 import roughnessMap0 from '../images/vintage/vintage-tile1_roughness-min.png'
 
-import abedoMap1 from '../images/rust/rustediron2_basecolor-min.png'
-import aoMap1 from '../images/rust/rustediron2_ao-min.png'
-import metallicMap1 from '../images/rust/rustediron2_metallic-min.png'
-import normalMap1 from '../images/rust/rustediron2_normal-min.png'
-import roughnessMap1 from '../images/rust/rustediron2_roughness-min.png'
+import abedoMap1 from '../images/rust/rustediron2_basecolor.png'
+import aoMap1 from '../images/rust/rustediron2_ao.png'
+import metallicMap1 from '../images/rust/rustediron2_metallic.png'
+import normalMap1 from '../images/rust/rustediron2_normal.png'
+import roughnessMap1 from '../images/rust/rustediron2_roughness.png'
 
 import abedoMap2 from '../images/grass/leafy-grass2-albedo-min.png'
 import aoMap2 from '../images/grass/leafy-grass2-ao-min.png'
@@ -250,7 +250,7 @@ $loader.setAttribute(
   `
   position: fixed;
   bottom: 1rem;
-  left: 1rem;
+  right: 1rem;
   color: white;
   font-family: monospace;
 `,

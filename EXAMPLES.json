@@ -1,0 +1,19 @@
+[
+  {
+    "title": "PBR Basics",
+    "id": "pbr-basics",
+    "slug": "index"
+  },
+  {
+    "title": "Textured PBR",
+    "id": "textured-pbr",
+    "slug": "textured-pbr",
+    "description": "PBR textures taken from the <a href=\"https://freepbr.com/\">Free PBR</a> repository. Thanks!"
+  },
+  {
+    "title": "IBL Irradiance Conversion",
+    "id": "ibl-irradiance-conversion",
+    "slug": "ibl-irradiance-conversion",
+    "description": "PBR textures taken from the <a href=\"https://freepbr.com/\">Free PBR</a> repository. Thanks!"
+  }
+]

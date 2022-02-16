@@ -10,11 +10,14 @@ uniform View {
   float time;
 };
 
+uniform PostFX {
+  float tonemappingMode;
+};
+
 #ifdef USE_PBR
   uniform Lighting {
     vec3 pointLightPositions[POINT_LIGHTS_COUNT];
     vec3 pointLightColors[POINT_LIGHTS_COUNT];
-    float pointLightIntensity;
-    float tonemappingMode;
+    float pointLightIntensity;  
   };
 #endif

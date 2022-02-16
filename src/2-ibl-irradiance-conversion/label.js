@@ -137,6 +137,7 @@ export default class Label extends Drawable {
       this.gl.UNSIGNED_SHORT,
       0,
     )
+    this.gl.bindTexture(this.gl.TEXTURE_2D, null)
     this.gl.bindVertexArray(null)
   }
 }

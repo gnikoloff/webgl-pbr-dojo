@@ -8,11 +8,14 @@ html(lang="en")
     link(rel="stylesheet" href=filters.url(`/assets/style.css`))
   body(data-base-url=filters.url(`/`))
     nav#project-nav
-      ul
-        li
-          a(href=filters.url(`/${prevId}`))= prevId
-        li
-          a(href=filters.url(`/${nextId}`))= nextId
+      ol
+        each example in EXAMPLES
+          li(class=`${example.id === id ? 'active' : ''}`)
+            a(href=filters.url(`/${example.slug}.html`))= example.title
+
+    footer.description
+      div !{description}
+
     script(src=filters.url(`/assets/${id}.js`) type="module")
     script.
       window.BASE_URL = document.body.getAttribute('data-base-url')

@@ -1,5 +1,6 @@
 module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ 'site/assets': 'assets' })
+  eleventyConfig.addPassthroughCopy('src/_redirects')
   global.filters = eleventyConfig.javascriptFunctions // magic happens here
   eleventyConfig.setPugOptions({
     // and here
@@ -12,5 +13,6 @@ module.exports = function (eleventyConfig) {
       layouts: '_layouts',
     },
     pathPrefix: '/webgl-pbr',
+    passthroughFileCopy: true,
   }
 }

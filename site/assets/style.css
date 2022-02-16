@@ -9,33 +9,42 @@ body {
 
 #project-nav {
   position: fixed;
-  bottom: 0;
-  right: 0;
+  top: 0;
+  left: 0;
 }
 
 #project-nav ul {
-  display: flex;
-  padding-right: 1rem;
-  list-style: none;
+  padding-left: 0;
 }
 
 #project-nav li {
   margin-left: 1rem;
+  margin-bottom: 12px;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+#project-nav li.active {
+  color: white;
+}
+
+#project-nav li:last-of-type {
+  margin-bottom: 0;
 }
 
 #project-nav a {
-  display: flex;
-  align-items: center;
-  color: white;
+  color: inherit;
   text-decoration: none;
 }
 
-#project-nav ul li:first-of-type a:before {
-  content: '‹‹';
-  margin-right: 0.5rem;
+.description {
+  padding-left: 1rem;
+  padding-bottom: 1rem;
+  color: white;
+  position: fixed;
+  bottom: 0;
+  left: 0;
 }
 
-#project-nav ul li:last-of-type a:after {
-  content: '››';
-  margin-left: 0.5rem;
+.description a {
+  color: white;
 }

@@ -7,6 +7,9 @@ export default class Sphere extends Drawable {
   #projectionUBOIndex
   #viewUBOIndex
   #lightingUBOIndex
+  #postFXUBOIndex
+
+  envMapTexture
 
   constructor(gl, geometry, defines) {
     super(
@@ -15,6 +18,7 @@ export default class Sphere extends Drawable {
       UBER_SHADER_FRAG,
       {
         USE_PBR: true,
+        HAS_ENV_MAP: false,
         PI: Math.PI,
         ...defines,
       },
@@ -78,6 +82,10 @@ export default class Sphere extends Drawable {
       type: gl.FLOAT_VEC3,
       value: new Float32Array([1, 0, 0]),
     })
+    this.setUniform('u_environmentMap', {
+      type: gl.INT,
+      value: 0,
+    })
 
     this.#projectionUBOIndex = gl.getUniformBlockIndex(
       this.program,
@@ -85,13 +93,24 @@ export default class Sphere extends Drawable {
     )
     this.#viewUBOIndex = gl.getUniformBlockIndex(this.program, 'View')
     this.#lightingUBOIndex = gl.getUniformBlockIndex(this.program, 'Lighting')
+    this.#postFXUBOIndex = gl.getUniformBlockIndex(this.program, 'PostFX')
   }
 
   render() {
+    if (!this.visible) {
+      return
+    }
     this.gl.uniformBlockBinding(this.program, this.#projectionUBOIndex, 0)
     this.gl.uniformBlockBinding(this.program, this.#viewUBOIndex, 1)
     this.gl.uniformBlockBinding(this.program, this.#lightingUBOIndex, 2)
+    this.gl.uniformBlockBinding(this.program, this.#postFXUBOIndex, 3)
     this.gl.useProgram(this.program)
+
+    if (this.envMapTexture) {
+      this.gl.activeTexture(this.gl.TEXTURE0)
+      this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP, this.envMapTexture)
+    }
+
     this.gl.bindVertexArray(this.vao)
     this.gl.drawElements(
       this.gl.TRIANGLES,

@@ -41,7 +41,6 @@ in vec3 vWorldPos;
 out vec4 finalColor;
 
 void main () {
-  
 
   #ifdef USE_PBR
     vec3 V = normalize(cameraPosition - vWorldPos);

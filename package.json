@@ -12,9 +12,12 @@
     "dev": "DEV=1 vite",
     "build": "vite build",
     "preview": "vite preview",
+    "clean:examples": "del site/examples/** !site/examples/",
+    "copy:examples": "copy EXAMPLES.json site/_data",
+    "create:examples": "node make-example-markdown-files.js",
     "clean:docs": "del docs",
     "out:docs": "npx eleventy --config=./eleventy.js --serve",
-    "serve:docs": "run-s build clean:docs out:docs"
+    "serve:docs": "run-s build clean:examples create:examples copy:examples clean:docs out:docs"
   },
   "devDependencies": {
     "del-cli": "^4.0.1",
@@ -25,6 +28,7 @@
     "vite-plugin-glsl": "^0.0.9"
   },
   "dependencies": {
+    "copy": "^0.3.2",
     "tweakpane": "^3.0.7"
   }
 }

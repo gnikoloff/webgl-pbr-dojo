@@ -21,6 +21,7 @@ export default ({ mode }) => {
           : [
               'src/0-pbr-basics/pbr-basics.js',
               'src/1-textured-pbr/textured-pbr.js',
+              'src/2-ibl-irradiance-conversion/ibl-irradiance-conversion.js',
             ],
       },
     },
