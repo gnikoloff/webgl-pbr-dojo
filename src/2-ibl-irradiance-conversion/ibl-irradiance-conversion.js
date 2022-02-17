@@ -16,15 +16,23 @@ import {
 import Sphere from './sphere'
 import Label from './label'
 import CubemapConverter from './cubemap-converter'
-
-import hdrImageSrc from '../images/hdr/NarrowPath_3k.hdr'
 import Skybox from './skybox'
+
+import hdrImageSrc0 from '../images/environment/MonValley_A_LookoutPoint_Env.hdr'
+import skyboxImageSrc0 from '../images/environment/MonValley_A_LookoutPoint_8k.jpg'
+import hdrImageSrc1 from '../images/environment/Theatre-Center_Env.hdr'
+import skyboxImageSrc1 from '../images/environment/Theatre-Center_8k_TMap.jpg'
+import hdrImageSrc2 from '../images/environment/Tokyo_BigSight_Env.hdr'
+import skyboxImageSrc2 from '../images/environment/Tokyo_BigSight_8k.jpg'
 
 import UBER_VERTEX_SHADER_SRC from './shaders/uber.vert'
 import SKYBOX_FRAGMENT_SHADER_SRC from './shaders/skybox.frag'
 import EQIORECTANGULAR_TO_CUBEMAP_FRAGMENT_SHADER_SRC from './shaders/equirectangular-to-cubemap.frag'
-import CONVOLUTE_CUBEMAP_FRAGMENT_SHADER_SRC from './shaders/convolute-cubemap.frag'
 import SPHERE_FRAGMENT_SHADER_SRC from './shaders/sphere.frag'
+import LABEL_FRAGMENT_SHADER_SRC from './shaders/label.frag'
+// this demo takes in already convoluted irradiance map,
+// hence no need for a manual step with a manual convolution shader!
+// import CONVOLUTE_CUBEMAP_FRAGMENT_SHADER_SRC from './shaders/convolute-cubemap.frag'
 
 const SPHERE_GRID_X_COUNT = 7
 const SPHERE_GRID_Y_COUNT = 7
@@ -58,13 +66,27 @@ const CUBEMAP_SIDES_CAPTURE_UP_VECTORS = [
   [0, -1, 0],
 ]
 
+// prettier-ignore
+const IRRADIANCEMAP_IMAGE_SOURCES = [
+  hdrImageSrc0,
+  hdrImageSrc1,
+  hdrImageSrc2
+]
+
+// prettier-ignore
+const SKYBOX_IMAGE_SOURCES = [
+  skyboxImageSrc0,
+  skyboxImageSrc1,
+  skyboxImageSrc2
+]
+
 const TWEAK_PARAMS = {
   useDiffuseLight: true,
 }
 
 const tonemappingModeFloat32 = new Float32Array([2])
 const pointLightIntensityFloat32 = new Float32Array([40])
-const diffuseLightMixFactorFloat32 = new Float32Array([0])
+const diffuseLightMixFactorFloat32 = new Float32Array([1]) // image diffuse light on by default
 
 const pane = new Pane()
 pane.element.parentNode.style.setProperty('width', '340px')
@@ -94,7 +116,7 @@ pane
     label: 'use diffuse light',
   })
   .on('change', ({ value }) => {
-    diffuseLightMixFactorFloat32[0] = value
+    diffuseLightMixFactorFloat32[0] = value ? 1 : 0
   })
 
 const canvas = document.createElement('canvas')
@@ -188,7 +210,13 @@ for (let y = 0; y < SPHERE_GRID_Y_COUNT; y++) {
   }
 }
 
-const roughnessLabel = new Label(gl, 'roughness', labelGeometry)
+const roughnessLabel = new Label(
+  gl,
+  'roughness',
+  labelGeometry,
+  UBER_VERTEX_SHADER_SRC,
+  LABEL_FRAGMENT_SHADER_SRC,
+)
 roughnessLabel.setPosition([
   -SPHERE_GRID_WIDTH / 2 + labelGeometry.width / 2,
   -SPHERE_GRID_HEIGHT / 2 - labelGeometry.height,
@@ -196,7 +224,13 @@ roughnessLabel.setPosition([
 ])
 scene.addChild(roughnessLabel)
 
-const metallicLabel = new Label(gl, 'metallic', labelGeometry)
+const metallicLabel = new Label(
+  gl,
+  'metallic',
+  labelGeometry,
+  UBER_VERTEX_SHADER_SRC,
+  LABEL_FRAGMENT_SHADER_SRC,
+)
 metallicLabel
   .setPosition([
     -SPHERE_GRID_WIDTH / 2 - labelGeometry.height,
@@ -206,8 +240,7 @@ metallicLabel
   .setRotation([0, 0, Math.PI * 0.5])
 scene.addChild(metallicLabel)
 
-// sphere.setPosition([1, 1, 0]).updateWorldMatrix()
-
+// UBO setup
 const projectionUBOInfo = createUniformBlockInfo(
   gl,
   scene.children[0].program,
@@ -256,204 +289,49 @@ for (let i = 0; i < POINT_LIGHT_POSITIONS_COUNT; i++) {
   )
 }
 
+// we will project the equirectangular texture to this unit cube, place a camera inside and
+// take a snapshot of each of the 6 sides, in the process converting it to cubemap texture
 const equirectangularToCubemap = new CubemapConverter(
   gl,
   cubemapGeometry,
   UBER_VERTEX_SHADER_SRC,
   EQIORECTANGULAR_TO_CUBEMAP_FRAGMENT_SHADER_SRC,
-  {
-    USE_UNIQUE_PROJECTION_VIEW_MATRIX: true,
-  },
 )
 equirectangularToCubemap.setUniform('u_equirectangularMap', {
   type: gl.INT,
   value: 0,
 })
 
-const cubemapToIrradiance = new CubemapConverter(
-  gl,
-  cubemapGeometry,
-  UBER_VERTEX_SHADER_SRC,
-  CONVOLUTE_CUBEMAP_FRAGMENT_SHADER_SRC,
-  {
-    USE_UNIQUE_PROJECTION_VIEW_MATRIX: true,
-  },
-)
-cubemapToIrradiance.setUniform('u_environmentMap', { type: gl.INT, value: 0 })
-
 const skybox = new Skybox(
   gl,
   cubemapGeometry,
   UBER_VERTEX_SHADER_SRC,
   SKYBOX_FRAGMENT_SHADER_SRC,
-  { IS_CUBEMAP: true },
 )
 
-// this part converts equirectangular image onto a cubic shape
-// first we load the HDR equirectangular image and create a
-// 16 bit (half float) HDR texture to hold it
+// we need that extension to render to half float 16bit framebuffer!
+gl.getExtension('EXT_color_buffer_float')
+
 const myHDR = new HDRImage()
-myHDR.src = hdrImageSrc
+myHDR.src = IRRADIANCEMAP_IMAGE_SOURCES[0]
 myHDR.onload = () => {
-  // debugger
-  const hdrTexture = gl.createTexture()
-  gl.bindTexture(gl.TEXTURE_2D, hdrTexture)
-  gl.texImage2D(
-    gl.TEXTURE_2D,
-    0,
-    gl.RGB9_E5,
-    myHDR.width,
-    myHDR.height,
-    0,
-    gl.RGB,
-    gl.FLOAT,
-    myHDR.dataFloat,
-  )
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-
-  gl.bindTexture(gl.TEXTURE_2D, null)
-
-  // at this point the equirectangular texture is mapped onto a unit cube
-  equirectangularToCubemap.texture = hdrTexture
-
-  // next up we want to split it into 6 separate textures, one for each face of the cube
-  const cubebapSideTexSize = 1024
-
-  // we need that extension to render to half float 16bit framebuffer!
-  gl.getExtension('EXT_color_buffer_float')
-
-  // our framebuffer to hold our 6 equirectangularToCubemap textures
-  const captureCubeSidesFramebuffer = gl.createFramebuffer()
-
-  gl.bindFramebuffer(gl.FRAMEBUFFER, captureCubeSidesFramebuffer)
-  // attach depth buffer
-  const depthBuffer = gl.createRenderbuffer()
-  gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer)
-  gl.renderbufferStorage(
-    gl.RENDERBUFFER,
-    gl.DEPTH_COMPONENT16,
-    cubebapSideTexSize,
-    cubebapSideTexSize,
-  )
-  gl.framebufferRenderbuffer(
-    gl.FRAMEBUFFER,
-    gl.DEPTH_ATTACHMENT,
-    gl.RENDERBUFFER,
-    depthBuffer,
-  )
-
-  const cubemapTexture = gl.createTexture()
-  gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubemapTexture)
-  for (let i = 0; i < 6; i++) {
-    const side = gl.TEXTURE_CUBE_MAP_POSITIVE_X + i
-    // important - store each face with 16bit floating values to preserve HDR
-    gl.texImage2D(
-      side,
-      0,
-      gl.RGBA16F,
-      cubebapSideTexSize,
-      cubebapSideTexSize,
-      0,
-      gl.RGBA,
-      gl.FLOAT,
-      null,
-    )
-    // TODO: could we do proper mipmapping here and use different wrapping and min/mag filtering?
-    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_R, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-  }
-
-  // lets capture the equirectangular 2D texture onto the equirectangularToCubemap faces
-
-  gl.bindFramebuffer(gl.FRAMEBUFFER, captureCubeSidesFramebuffer)
-  gl.viewport(0, 0, cubebapSideTexSize, cubebapSideTexSize)
-
-  for (let i = 0; i < 6; i++) {
-    gl.framebufferTexture2D(
-      gl.FRAMEBUFFER,
-      gl.COLOR_ATTACHMENT0,
-      gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
-      cubemapTexture,
-      0,
-    )
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-
-    // look at each correct face with our camera in the center of the world
-    captureFaceCamera.lookAt = CUBEMAP_SIDES_CAPTURE_LOOK_ATS[i]
-    captureFaceCamera.upVector = CUBEMAP_SIDES_CAPTURE_UP_VECTORS[i]
-    captureFaceCamera.updateViewMatrix().updateProjectionViewMatrix()
-
-    // render to appropriate cube texture with current camera lookAt orientation
-    equirectangularToCubemap.render(captureFaceCamera)
-  }
-
-  // After generating the HDR cubemap, we need to convolute it to a 32x32 irradiance map
-  cubemapToIrradiance.envTexture = cubemapTexture
-
-  const irradianceCubeTexSize = 32
-  const irradianceTexture = gl.createTexture()
-  gl.bindTexture(gl.TEXTURE_CUBE_MAP, irradianceTexture)
-  for (let i = 0; i < 6; i++) {
-    gl.texImage2D(
-      gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
-      0,
-      gl.RGBA16F,
-      irradianceCubeTexSize,
-      irradianceCubeTexSize,
-      0,
-      gl.RGBA,
-      gl.FLOAT,
-      null,
-    )
-  }
-  gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-  gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-  gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_R, gl.CLAMP_TO_EDGE)
-  gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-  gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-
-  gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer)
-  gl.renderbufferStorage(
-    gl.RENDERBUFFER,
-    gl.DEPTH_COMPONENT24,
-    irradianceCubeTexSize,
-    irradianceCubeTexSize,
-  )
-
-  gl.viewport(0, 0, irradianceCubeTexSize, irradianceCubeTexSize)
-  for (let i = 0; i < 6; i++) {
-    gl.framebufferTexture2D(
-      gl.FRAMEBUFFER,
-      gl.COLOR_ATTACHMENT0,
-      gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
-      irradianceTexture,
-      0,
-    )
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-    captureFaceCamera.lookAt = CUBEMAP_SIDES_CAPTURE_LOOK_ATS[i]
-    captureFaceCamera.upVector = CUBEMAP_SIDES_CAPTURE_UP_VECTORS[i]
-    captureFaceCamera.updateViewMatrix().updateProjectionViewMatrix()
-    cubemapToIrradiance.render(captureFaceCamera)
-  }
-
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null)
-
-  skybox.texture = cubemapTexture
-  // skybox.texture = irradianceTexture
-  for (const sphere of spheres) {
-    sphere.envMapTexture = irradianceTexture
-  }
-
-  // clean up
-  gl.deleteFramebuffer(captureCubeSidesFramebuffer)
-  gl.deleteRenderbuffer(depthBuffer)
-  gl.deleteTexture(hdrTexture)
+  // converts equirectangular image onto a cubemap with 6 side textures
+  // we load the HDR equirectangular image and create a
+  // 16 bit (half float) HDR texture to hold it
+  convertEquirectangularToCubeMap(myHDR, 256, (cubemapTexture) => {
+    for (const sphere of spheres) {
+      sphere.envMapTexture = cubemapTexture
+    }
+  })
+}
+const skyboxImage = new Image()
+skyboxImage.src = SKYBOX_IMAGE_SOURCES[0]
+skyboxImage.onload = () => {
+  // load the environment as a equirectangular image and convert it to a cubemap with 6 side textures
+  // we load it as gl.sRGB texture so we can tonemap it accordingly and apply gamma correction ourselves
+  convertEquirectangularToCubeMap(skyboxImage, 1024, (cubemapTexture) => {
+    skybox.texture = cubemapTexture
+  })
 }
 
 requestAnimationFrame(drawFrame)
@@ -566,6 +444,128 @@ function drawFrame(ts) {
 
   gl.depthFunc(gl.LESS)
   scene.updateWorldMatrix().render()
+}
+
+function convertEquirectangularToCubeMap(
+  image,
+  cubemapResolution,
+  onCubeTextureTransform,
+) {
+  const skyboxTexture = gl.createTexture()
+  gl.bindTexture(gl.TEXTURE_2D, skyboxTexture)
+  const isHDRImage = !!image.dataFloat
+  if (isHDRImage) {
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGB9_E5,
+      image.width,
+      image.height,
+      0,
+      gl.RGB,
+      gl.FLOAT,
+      image.dataFloat,
+    )
+  } else {
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.SRGB8,
+      skyboxImage.width,
+      skyboxImage.height,
+      0,
+      gl.RGB,
+      gl.UNSIGNED_BYTE,
+      skyboxImage,
+    )
+  }
+
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+
+  gl.bindTexture(gl.TEXTURE_2D, null)
+
+  // at this point the equirectangular texture is mapped onto a unit cube
+  equirectangularToCubemap.texture = skyboxTexture
+
+  // our framebuffer to hold our 6 equirectangularToCubemap textures
+  const captureCubeSidesFramebuffer = gl.createFramebuffer()
+
+  gl.bindFramebuffer(gl.FRAMEBUFFER, captureCubeSidesFramebuffer)
+  // attach depth buffer
+  const depthBuffer = gl.createRenderbuffer()
+  gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer)
+  gl.renderbufferStorage(
+    gl.RENDERBUFFER,
+    gl.DEPTH_COMPONENT16,
+    cubemapResolution,
+    cubemapResolution,
+  )
+  gl.framebufferRenderbuffer(
+    gl.FRAMEBUFFER,
+    gl.DEPTH_ATTACHMENT,
+    gl.RENDERBUFFER,
+    depthBuffer,
+  )
+
+  const cubemapTexture = gl.createTexture()
+  gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubemapTexture)
+  for (let i = 0; i < 6; i++) {
+    const side = gl.TEXTURE_CUBE_MAP_POSITIVE_X + i
+    // important - store each face with 16bit floating values to preserve HDR
+    gl.texImage2D(
+      side,
+      0,
+      gl.RGBA16F,
+      cubemapResolution,
+      cubemapResolution,
+      0,
+      gl.RGBA,
+      gl.FLOAT,
+      null,
+    )
+    // TODO: could we do proper mipmapping here and use different wrapping and min/mag filtering?
+    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_R, gl.CLAMP_TO_EDGE)
+    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+  }
+
+  // lets capture the equirectangular 2D texture onto the equirectangularToCubemap faces
+
+  gl.bindFramebuffer(gl.FRAMEBUFFER, captureCubeSidesFramebuffer)
+  gl.viewport(0, 0, cubemapResolution, cubemapResolution)
+
+  for (let i = 0; i < 6; i++) {
+    gl.framebufferTexture2D(
+      gl.FRAMEBUFFER,
+      gl.COLOR_ATTACHMENT0,
+      gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
+      cubemapTexture,
+      0,
+    )
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
+    // look at each correct face with our camera in the center of the world
+    captureFaceCamera.lookAt = CUBEMAP_SIDES_CAPTURE_LOOK_ATS[i]
+    captureFaceCamera.upVector = CUBEMAP_SIDES_CAPTURE_UP_VECTORS[i]
+    captureFaceCamera.updateViewMatrix().updateProjectionViewMatrix()
+
+    // render to appropriate cube texture with current camera lookAt orientation
+    equirectangularToCubemap.render(captureFaceCamera)
+  }
+
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+
+  onCubeTextureTransform(cubemapTexture)
+
+  // clean up
+  gl.deleteTexture(skyboxTexture)
+  gl.deleteFramebuffer(captureCubeSidesFramebuffer)
+  gl.deleteRenderbuffer(depthBuffer)
 }
 
 function onResize() {

@@ -10,6 +10,7 @@ export default class Skybox extends Drawable {
   constructor(gl, geometry, vsShader, fsShader, defines = {}) {
     super(gl, vsShader, fsShader, {
       PI: Math.PI,
+      IS_CUBEMAP: true,
       ...defines,
     })
     const { vertexCount, vertexStride, interleavedArray, indicesArray } =

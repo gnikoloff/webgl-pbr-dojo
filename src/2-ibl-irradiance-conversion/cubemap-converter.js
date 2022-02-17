@@ -7,6 +7,7 @@ export default class CubemapConverter extends Drawable {
   constructor(gl, geometry, vsSource, fsSource, defines = {}) {
     super(gl, vsSource, fsSource, {
       PI: Math.PI,
+      USE_UNIQUE_PROJECTION_VIEW_MATRIX: true,
       ...defines,
     })
     const { vertexCount, vertexStride, interleavedArray, indicesArray } =

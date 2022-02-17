@@ -1,8 +1,5 @@
 import { Drawable } from '../lib/hwoa-rang-gl2/dist'
 
-import UBER_SHADER_VERT from './shaders/uberShader.vert'
-import UBER_SHADER_FRAG from './shaders/uberShader.frag'
-
 export default class Label extends Drawable {
   #texture
 
@@ -48,12 +45,13 @@ export default class Label extends Drawable {
     return canvas
   }
 
-  constructor(gl, text, geometry, defines) {
-    super(gl, UBER_SHADER_VERT, UBER_SHADER_FRAG, {
+  constructor(gl, text, geometry, vsShader, fsShader, defines) {
+    super(gl, vsShader, fsShader, {
       PI: Math.PI,
-      USE_DIFFUSE_ONLY: true,
+      USE_UV: true,
       ...defines,
     })
+
     const { vertexCount, vertexStride, interleavedArray, indicesArray } =
       geometry
 

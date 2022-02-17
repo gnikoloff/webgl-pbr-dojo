@@ -116,6 +116,11 @@ export default class Sphere extends Drawable {
       this.gl.UNSIGNED_SHORT,
       0,
     )
+
+    if (this.envMapTexture) {
+      this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP, null)
+    }
+
     this.gl.bindVertexArray(null)
   }
 }

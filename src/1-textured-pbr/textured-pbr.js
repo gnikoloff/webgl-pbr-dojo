@@ -14,23 +14,23 @@ import {
 import Sphere from './sphere'
 import Label from './label'
 
-import abedoMap0 from '../images/vintage/vintage-tile1_albedo-min.png'
-import aoMap0 from '../images/vintage/vintage-tile1_ao-min.png'
-import metallicMap0 from '../images/vintage/vintage-tile1_metallic-min.png'
-import normalMap0 from '../images/vintage/vintage-tile1_normal-ogl-min.png'
-import roughnessMap0 from '../images/vintage/vintage-tile1_roughness-min.png'
+import abedoMap0 from '../images/pbr/vintage/vintage-tile1_albedo-min.png'
+import aoMap0 from '../images/pbr/vintage/vintage-tile1_ao-min.png'
+import metallicMap0 from '../images/pbr/vintage/vintage-tile1_metallic-min.png'
+import normalMap0 from '../images/pbr/vintage/vintage-tile1_normal-ogl-min.png'
+import roughnessMap0 from '../images/pbr/vintage/vintage-tile1_roughness-min.png'
 
-import abedoMap1 from '../images/rust/rustediron2_basecolor.png'
-import aoMap1 from '../images/rust/rustediron2_ao.png'
-import metallicMap1 from '../images/rust/rustediron2_metallic.png'
-import normalMap1 from '../images/rust/rustediron2_normal.png'
-import roughnessMap1 from '../images/rust/rustediron2_roughness.png'
+import abedoMap1 from '../images/pbr/rust/rustediron2_basecolor.png'
+import aoMap1 from '../images/pbr/rust/rustediron2_ao.png'
+import metallicMap1 from '../images/pbr/rust/rustediron2_metallic.png'
+import normalMap1 from '../images/pbr/rust/rustediron2_normal.png'
+import roughnessMap1 from '../images/pbr/rust/rustediron2_roughness.png'
 
-import abedoMap2 from '../images/grass/leafy-grass2-albedo-min.png'
-import aoMap2 from '../images/grass/leafy-grass2-ao-min.png'
-import metallicMap2 from '../images/grass/leafy-grass2-metallic-min.png'
-import normalMap2 from '../images/grass/leafy-grass2-normal-ogl-min.png'
-import roughnessMap2 from '../images/grass/leafy-grass2-roughness-min.png'
+import abedoMap2 from '../images/pbr/grass/leafy-grass2-albedo-min.png'
+import aoMap2 from '../images/pbr/grass/leafy-grass2-ao-min.png'
+import metallicMap2 from '../images/pbr/grass/leafy-grass2-metallic-min.png'
+import normalMap2 from '../images/pbr/grass/leafy-grass2-normal-ogl-min.png'
+import roughnessMap2 from '../images/pbr/grass/leafy-grass2-roughness-min.png'
 
 const SPHERE_GRID_X_COUNT = 7
 const SPHERE_GRID_Y_COUNT = 7
