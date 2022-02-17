@@ -141,7 +141,7 @@ pane
       // 16 bit (half float) HDR texture to hold it
       convertEquirectangularToCubeMap(myHDR, 256, (cubemapTexture) => {
         for (const sphere of spheres) {
-          sphere.envMapTexture = cubemapTexture
+          sphere.irradianceMapTexture = cubemapTexture
         }
       })
     }
@@ -359,7 +359,7 @@ myHDR.onload = () => {
   // 16 bit (half float) HDR texture to hold it
   convertEquirectangularToCubeMap(myHDR, 256, (cubemapTexture) => {
     for (const sphere of spheres) {
-      sphere.envMapTexture = cubemapTexture
+      sphere.irradianceMapTexture = cubemapTexture
     }
   })
 }

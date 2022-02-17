@@ -6,6 +6,7 @@ export default class Sphere extends Drawable {
   #lightingUBOIndex
   #postFXUBOIndex
 
+  irradianceMapTexture
   envMapTexture
 
   constructor(gl, geometry, vsShader, fsShader, defines) {
@@ -104,8 +105,13 @@ export default class Sphere extends Drawable {
     this.gl.uniformBlockBinding(this.program, this.#postFXUBOIndex, 3)
     this.gl.useProgram(this.program)
 
-    if (this.envMapTexture) {
+    if (this.irradianceMapTexture) {
       this.gl.activeTexture(this.gl.TEXTURE0)
+      this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP, this.irradianceMapTexture)
+    }
+
+    if (this.envMapTexture) {
+      this.gl.activeTexture(this.gl.TEXTURE1)
       this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP, this.envMapTexture)
     }
 
@@ -117,9 +123,7 @@ export default class Sphere extends Drawable {
       0,
     )
 
-    if (this.envMapTexture) {
-      this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP, null)
-    }
+    this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP, null)
 
     this.gl.bindVertexArray(null)
   }

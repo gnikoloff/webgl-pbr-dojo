@@ -15,6 +15,7 @@ uniform vec3 u_albedo;
 uniform float u_metallic;
 uniform float u_roughness;
 uniform samplerCube u_irradianceMap;
+// uniform samplerCube u_environmentMap;
 
 in vec3 vNormal;
 in vec3 vWorldPos;
@@ -83,8 +84,13 @@ void main () {
   vec3 irradiance = texture(u_irradianceMap, N).rgb;
   vec3 diffuse = irradiance * u_albedo;
   
-  ambient = mix(vec3(0.1) * u_albedo, kD * diffuse, diffuseLightMixFactor);
+  
+  ambient = mix(vec3(0.03) * u_albedo, kD * diffuse, diffuseLightMixFactor);
 
+  // vec3 I = normalize(vWorldPos - cameraPosition);
+  // vec3 R = reflect(I, N);
+  // vec4 skyboxColor = texture(u_environmentMap, R);
+  
   vec3 color = ambient + Lo;
     
   // support for different HDR tone mapping modes
