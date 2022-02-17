@@ -1,5 +1,7 @@
-import HDRImage from '../lib/hdr-png'
 import { Pane } from 'tweakpane'
+import * as TweakpaneThumbnailListPlugin from 'tweakpane-plugin-thumbnail-list'
+
+import HDRImage from '../lib/hdr-png'
 
 import {
   createSphere,
@@ -67,21 +69,22 @@ const CUBEMAP_SIDES_CAPTURE_UP_VECTORS = [
 ]
 
 // prettier-ignore
-const IRRADIANCEMAP_IMAGE_SOURCES = [
-  hdrImageSrc0,
-  hdrImageSrc1,
-  hdrImageSrc2
-]
+const IRRADIANCEMAP_IMAGE_SOURCES = new Map([
+  ['mon-valley', hdrImageSrc0],
+  ['theatre', hdrImageSrc1],
+  ['tokyo', hdrImageSrc2]
+])
 
 // prettier-ignore
-const SKYBOX_IMAGE_SOURCES = [
-  skyboxImageSrc0,
-  skyboxImageSrc1,
-  skyboxImageSrc2
-]
+const SKYBOX_IMAGE_SOURCES = new Map([
+  ['mon-valley', skyboxImageSrc0],
+  ['theatre', skyboxImageSrc1],
+  ['tokyo', skyboxImageSrc2],
+])
 
 const TWEAK_PARAMS = {
   useDiffuseLight: true,
+  image: 'mon-valley',
 }
 
 const tonemappingModeFloat32 = new Float32Array([2])
@@ -89,7 +92,9 @@ const pointLightIntensityFloat32 = new Float32Array([40])
 const diffuseLightMixFactorFloat32 = new Float32Array([1]) // image diffuse light on by default
 
 const pane = new Pane()
-pane.element.parentNode.style.setProperty('width', '340px')
+pane.registerPlugin(TweakpaneThumbnailListPlugin)
+hideNoneOptionFromTweakpane()
+pane.element.parentNode.style.setProperty('width', '400px')
 pane
   .addBlade({
     view: 'list',
@@ -113,10 +118,44 @@ pane
   })
 pane
   .addInput(TWEAK_PARAMS, 'useDiffuseLight', {
-    label: 'use diffuse light',
+    label: 'use environment diffuse light',
   })
   .on('change', ({ value }) => {
     diffuseLightMixFactorFloat32[0] = value ? 1 : 0
+  })
+pane
+  .addInput(TWEAK_PARAMS, 'image', {
+    label: 'environment image',
+    view: 'thumbnail-list',
+    options: [
+      { text: 'MonValley Lookout', value: 'mon-valley', src: skyboxImageSrc0 },
+      { text: 'Theatre Center', value: 'theatre', src: skyboxImageSrc1 },
+      { text: 'Tokyo BigSight', value: 'tokyo', src: skyboxImageSrc2 },
+    ],
+  })
+  .on('change', ({ value: { value } }) => {
+    const myHDR = new HDRImage()
+    myHDR.onload = () => {
+      // converts equirectangular image onto a cubemap with 6 side textures
+      // we load the HDR equirectangular image and create a
+      // 16 bit (half float) HDR texture to hold it
+      convertEquirectangularToCubeMap(myHDR, 256, (cubemapTexture) => {
+        for (const sphere of spheres) {
+          sphere.envMapTexture = cubemapTexture
+        }
+      })
+    }
+    myHDR.src = IRRADIANCEMAP_IMAGE_SOURCES.get(value)
+
+    const skyboxImage = new Image()
+    skyboxImage.onload = () => {
+      // load the environment as a equirectangular image and convert it to a cubemap with 6 side textures
+      // we load it as gl.sRGB texture so we can tonemap it accordingly and apply gamma correction ourselves
+      convertEquirectangularToCubeMap(skyboxImage, 1024, (cubemapTexture) => {
+        skybox.texture = cubemapTexture
+      })
+    }
+    skyboxImage.src = SKYBOX_IMAGE_SOURCES.get(value)
   })
 
 const canvas = document.createElement('canvas')
@@ -313,7 +352,7 @@ const skybox = new Skybox(
 gl.getExtension('EXT_color_buffer_float')
 
 const myHDR = new HDRImage()
-myHDR.src = IRRADIANCEMAP_IMAGE_SOURCES[0]
+myHDR.src = hdrImageSrc0
 myHDR.onload = () => {
   // converts equirectangular image onto a cubemap with 6 side textures
   // we load the HDR equirectangular image and create a
@@ -325,7 +364,7 @@ myHDR.onload = () => {
   })
 }
 const skyboxImage = new Image()
-skyboxImage.src = SKYBOX_IMAGE_SOURCES[0]
+skyboxImage.src = skyboxImageSrc0
 skyboxImage.onload = () => {
   // load the environment as a equirectangular image and convert it to a cubemap with 6 side textures
   // we load it as gl.sRGB texture so we can tonemap it accordingly and apply gamma correction ourselves
@@ -471,12 +510,12 @@ function convertEquirectangularToCubeMap(
       gl.TEXTURE_2D,
       0,
       gl.SRGB8,
-      skyboxImage.width,
-      skyboxImage.height,
+      skyboxImage.naturalWidth,
+      skyboxImage.naturalHeight,
       0,
       gl.RGB,
       gl.UNSIGNED_BYTE,
-      skyboxImage,
+      image,
     )
   }
 
@@ -575,4 +614,25 @@ function onResize() {
   canvas.height = innerHeight * devicePixelRatio
   canvas.style.setProperty('width', `${innerWidth}px`)
   canvas.style.setProperty('height', `${innerHeight}px`)
+}
+
+function hideNoneOptionFromTweakpane() {
+  const css = `
+    .tp-thumbv_ovl .tp-thumbv_opt:first-of-type {
+      display: none !important;
+    }
+    .tp-thumbv_thmb, .tp-thumbv_sthmb {
+      background-size: cover !important;
+    }
+  `
+  const element = document.createElement('style')
+  element.setAttribute('type', 'text/css')
+
+  if ('textContent' in element) {
+    element.textContent = css
+  } else {
+    element.styleSheet.cssText = css
+  }
+
+  document.getElementsByTagName('head')[0].appendChild(element)
 }

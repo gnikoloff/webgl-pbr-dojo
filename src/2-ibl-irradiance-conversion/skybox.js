@@ -5,7 +5,18 @@ export default class Skybox extends Drawable {
   #viewUBOIndex
   #postFXUBOIndex
 
-  texture
+  #texture
+
+  get texture() {
+    return this.#texture
+  }
+
+  set texture(v) {
+    if (this.#texture) {
+      this.gl.deleteTexture(this.#texture)
+    }
+    this.#texture = v
+  }
 
   constructor(gl, geometry, vsShader, fsShader, defines = {}) {
     super(gl, vsShader, fsShader, {
@@ -84,17 +95,23 @@ export default class Skybox extends Drawable {
     this.gl.uniformBlockBinding(this.program, this.#postFXUBOIndex, 3)
     this.gl.useProgram(this.program)
     this.gl.bindVertexArray(this.vao)
-    if (this.texture) {
+
+    if (this.#texture) {
       this.gl.activeTexture(this.gl.TEXTURE0)
-      this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP, this.texture)
+      this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP, this.#texture)
     }
+
     this.gl.drawElements(
       this.gl.TRIANGLES,
       this.vertexCount,
       this.gl.UNSIGNED_SHORT,
       0,
     )
-    this.gl.bindTexture(this.gl.TEXTURE_2D, null)
+
+    if (this.#texture) {
+      this.gl.bindTexture(this.gl.TEXTURE_2D, null)
+    }
+
     this.gl.bindVertexArray(null)
   }
 }
