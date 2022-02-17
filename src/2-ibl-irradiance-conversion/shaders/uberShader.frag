@@ -3,22 +3,13 @@ precision highp float;
 
 -- DEFINES_HOOK --
 
-#include shared-ubo.glsl;
+#include shared/ubos.glsl;
+#include shared/tone-mapping.glsl;
 #include pbr/fresnel-schlick.glsl;
+#include pbr/fresnel-schlick-roughness.glsl;
 #include pbr/distribution-ggx.glsl;
 #include pbr/geometry-smith.glsl;
 
-// tone mapping modes
-#include ../../shared/shaders/tone-mapping/aces.glsl
-#include ../../shared/shaders/tone-mapping/filmic.glsl
-#include ../../shared/shaders/tone-mapping/lottes.glsl
-#include ../../shared/shaders/tone-mapping/reinhard.glsl
-#include ../../shared/shaders/tone-mapping/reinhard2.glsl
-#include ../../shared/shaders/tone-mapping/uchimura.glsl
-#include ../../shared/shaders/tone-mapping/uncharted.glsl
-#include ../../shared/shaders/tone-mapping/unreal.glsl
-
-// PBR inputs
 #ifdef USE_PBR
   uniform vec3 u_albedo;
   uniform float u_metallic;
@@ -30,8 +21,12 @@ precision highp float;
   uniform sampler2D u_diffuse;
 #endif
 
-#ifdef HAS_ENV_MAP
+#ifdef USE_ENV_MAP
   uniform samplerCube u_environmentMap;
+#endif
+
+#ifdef USE_IRRADIANCE_MAP
+  uniform samplerCube u_irradianceMap;
 #endif
 
 #ifdef SAMPLE_EQUIRERECTANGULAR_MAP
@@ -47,37 +42,7 @@ precision highp float;
   }
 #endif
 
-vec3 tonemapColorBasedOnMode (vec3 color, float tonemappingMode) {
-  return mix(
-      aces(color),
-      mix(
-        tonemapFilmic(color),
-        mix(
-          lottes(color),
-          mix(
-            reinhard(color),
-            mix(
-              reinhard2(color),
-              mix(
-                uchimura(color),
-                mix(
-                  uncharted2(color),
-                  unreal(color),
-                  clamp(tonemappingMode, 6.0, 7.0) - 6.0
-                ),
-                clamp(tonemappingMode, 5.0, 6.0) - 5.0
-              ),
-              clamp(tonemappingMode, 4.0, 5.0) - 4.0
-            ),
-            clamp(tonemappingMode, 3.0, 4.0) - 3.0
-          ),
-          clamp(tonemappingMode, 2.0, 3.0) - 2.0
-        ),
-        clamp(tonemappingMode, 1.0, 2.0) - 1.0
-      ),
-      clamp(tonemappingMode, 0.0, 1.0)
-    );
-}
+
 
 in vec3 vNormal;
 in vec2 vUv;
@@ -87,8 +52,7 @@ in vec3 vLocalPos;
 out vec4 finalColor;
 
 void main () {
-  vec3 N = normalize(vNormal);
-  vec3 V = normalize(cameraPosition - vWorldPos);
+  
 
   #ifdef USE_PBR
     // calculate reflectance at normal incidence, if diaelectric (like plastic) use
@@ -113,7 +77,6 @@ void main () {
         // how much light energy comes from the light source
         vec3 radiance = pointLightColors[i] * attenuation;
 
-        float NdotV = max(dot(N, V), 0.0000001); // min of 0.0000001 to prevent divide by 0
         float NdotL = max(dot(N, L), 0.0000001);
         float HdotV = max(dot(H, V), 0.0);
         float NdotH = max(dot(N, H), 0.0);
@@ -138,41 +101,71 @@ void main () {
         Lo += (kD * u_albedo / PI + specular) * radiance * NdotL; 
     }
 
-    // support for different HDR tone mapping modes
-    Lo = tonemapColorBasedOnMode(Lo, tonemappingMode);
-    
-    // gamma correction
-    Lo = pow(Lo, vec3(1.0 / 2.2));
 
     // vec3 ambient = vec3(0.03) * albedo * ao;
     vec3 ambient = vec3(0.0);
-    #ifdef HAS_ENV_MAP
-      vec3 reflectedColor = texture(u_environmentMap, N).rgb;
+    #ifdef USE_ENV_MAP
+      vec3 reflectedColor = texture(u_environmentMap, reflect(cameraPosition, N)).rgb;
       ambient = reflectedColor * u_albedo;
     #else
-      ambient = vec3(0.3) * u_albedo;
+      #ifdef USE_IRRADIANCE_MAP
+        vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
+        vec3 kD = 1.0 - kS;
+        kD *= 1.0 - u_metallic;	 
+        vec3 irradiance = texture(u_irradianceMap, N).rgb;
+        vec3 diffuse = irradiance * u_albedo;
+        ambient = kD * diffuse;
+      #else
+        ambient = vec3(0.3) * u_albedo;
+      #endif
     #endif
     
     vec3 color = ambient + Lo;
+    
+    // support for different HDR tone mapping modes
+    color = applyTonemapping(color, tonemappingMode);
+    
+    // gamma correction
+    color = pow(color, vec3(1.0 / 2.2));
+
     finalColor = vec4(color, 1.0);
   #else
 
     #ifdef SAMPLE_EQUIRERECTANGULAR_MAP
       vec2 uv = sampleSphericalMap(normalize(vLocalPos));
-      vec3 color = texture(u_equirectangularMap, vec2(uv.x, 1.0 - uv.y)).rgb;
+      vec3 color = texture(u_equirectangularMap, uv).rgb;
       finalColor = vec4(color, 1.0);
     #else
-      #ifdef HAS_ENV_MAP
-        // load in HDR environment map
-        vec3 envColor = texture(u_environmentMap, vLocalPos).rgb;
-        // tonemapping
-        envColor = tonemapColorBasedOnMode(envColor, tonemappingMode);
-        // gamma correction
-        envColor = pow(envColor, vec3(1.0 / 2.2));
-        finalColor = vec4(envColor, 1.0);
+      #ifdef IS_CONVOLUTION_CUBEMAP
+        vec3 normal = normalize(vLocalPos);
+        vec3 irradiance = vec3(0.0);
+        vec3 up = vec3(0.0, 1.0, 0.0);
+        vec3 right = normalize(cross(up, normal));
+        up = normalize(cross(normal, right));
+
+        float sampleDelta = 0.025;
+        float nrSamples = 0.0; 
+        for (float phi = 0.0; phi < 2.0 * PI; phi += sampleDelta) {
+          for (float theta = 0.0; theta < 0.5 * PI; theta += sampleDelta) {
+            // spherical to cartesian (in tangent space)
+            vec3 tangentSample = vec3(sin(theta) * cos(phi),  sin(theta) * sin(phi), cos(theta));
+
+            // tangent space to world
+            vec3 sampleVec = tangentSample.x * right + tangentSample.y * up + tangentSample.z * normal; 
+
+            irradiance += texture(u_environmentMap, sampleVec).rgb * cos(theta) * sin(theta);
+            nrSamples++;
+          }
+        }
+        finalColor = vec4(PI * irradiance * (1.0 / float(nrSamples)), 1.0);
       #else
-        finalColor = texture(u_diffuse, vUv, -0.5);
+        #ifdef USE_ENV_MAP
+          
+        #else
+          finalColor = texture(u_diffuse, vUv, -0.5);
+        #endif
       #endif
     #endif
+
   #endif
 }

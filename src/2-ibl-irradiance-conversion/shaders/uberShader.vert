@@ -2,7 +2,7 @@
 
 -- DEFINES_HOOK --
 
-#include shared-ubo.glsl;
+#include shared/ubos.glsl;
 
 uniform mat4 u_worldMatrix;
 

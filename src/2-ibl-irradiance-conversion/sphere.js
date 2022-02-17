@@ -1,8 +1,5 @@
 import { createProgram, Drawable } from '../lib/hwoa-rang-gl2/dist'
 
-import UBER_SHADER_VERT from './shaders/uberShader.vert'
-import UBER_SHADER_FRAG from './shaders/uberShader.frag'
-
 export default class Sphere extends Drawable {
   #projectionUBOIndex
   #viewUBOIndex
@@ -11,15 +8,16 @@ export default class Sphere extends Drawable {
 
   envMapTexture
 
-  constructor(gl, geometry, defines) {
+  constructor(gl, geometry, vsShader, fsShader, defines) {
     super(
       gl,
-      UBER_SHADER_VERT,
-      UBER_SHADER_FRAG,
+      vsShader,
+      fsShader,
       {
-        USE_PBR: true,
-        HAS_ENV_MAP: false,
         PI: Math.PI,
+        USE_NORMAL: true,
+        USE_WORLD_POS: true,
+        USE_PBR: true,
         ...defines,
       },
       'sphere',
@@ -32,7 +30,7 @@ export default class Sphere extends Drawable {
 
     const aPosition = gl.getAttribLocation(this.program, 'aPosition')
     const aNormal = gl.getAttribLocation(this.program, 'aNormal')
-    const aUv = gl.getAttribLocation(this.program, 'aUv')
+    // const aUv = gl.getAttribLocation(this.program, 'aUv')
 
     const interleavedBuffer = gl.createBuffer()
     const indexBuffer = gl.createBuffer()
@@ -62,15 +60,15 @@ export default class Sphere extends Drawable {
       3 * Float32Array.BYTES_PER_ELEMENT,
     )
 
-    gl.enableVertexAttribArray(aUv)
-    gl.vertexAttribPointer(
-      aUv,
-      2,
-      gl.FLOAT,
-      false,
-      vertexStride * Float32Array.BYTES_PER_ELEMENT,
-      6 * Float32Array.BYTES_PER_ELEMENT,
-    )
+    // gl.enableVertexAttribArray(aUv)
+    // gl.vertexAttribPointer(
+    //   aUv,
+    //   2,
+    //   gl.FLOAT,
+    //   false,
+    //   vertexStride * Float32Array.BYTES_PER_ELEMENT,
+    //   6 * Float32Array.BYTES_PER_ELEMENT,
+    // )
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer)
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indicesArray, gl.STATIC_DRAW)
@@ -82,7 +80,7 @@ export default class Sphere extends Drawable {
       type: gl.FLOAT_VEC3,
       value: new Float32Array([1, 0, 0]),
     })
-    this.setUniform('u_environmentMap', {
+    this.setUniform('u_irradianceMap', {
       type: gl.INT,
       value: 0,
     })
