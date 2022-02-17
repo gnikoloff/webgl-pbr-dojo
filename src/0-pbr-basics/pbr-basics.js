@@ -13,6 +13,7 @@ import {
 
 import Sphere from './sphere'
 import Label from './label'
+import LightDebug from '../shared/light-debug'
 
 const SPHERE_GRID_X_COUNT = 7
 const SPHERE_GRID_Y_COUNT = 7
@@ -180,16 +181,20 @@ const lightingUBO = createAndBindUBOToBase(gl, lightingUBOInfo.blockSize, 2)
 
 const pointLightsPositions = []
 const pointLightsColors = []
+const debugLights = []
 
 for (let i = 0; i < POINT_LIGHT_POSITIONS_COUNT; i++) {
   pointLightsPositions.push(new Float32Array(3))
 
-  pointLightsColors.push(
-    new Float32Array([Math.random(), Math.random(), Math.random()]),
-  )
-}
+  const pointLight = [Math.random(), Math.random(), Math.random()]
 
-console.log(pointLightsPositions)
+  pointLightsColors.push(new Float32Array(pointLight))
+
+  const debugLight = new LightDebug(gl)
+  debugLight.color = [...pointLight, 1]
+  scene.addChild(debugLight)
+  debugLights.push(debugLight)
+}
 
 requestAnimationFrame(drawFrame)
 onResize()
@@ -242,14 +247,24 @@ function drawFrame(ts) {
     0,
   )
 
-  // Lighing UBO
+  // Lighing UBO and light debuggers
   gl.bindBuffer(gl.UNIFORM_BUFFER, lightingUBO)
   const speed = ts * 0.001
   for (let i = 0; i < POINT_LIGHT_POSITIONS_COUNT; i++) {
     const lightStep = (Math.PI * 2) / POINT_LIGHT_POSITIONS_COUNT
-    pointLightsPositions[i][0] = Math.cos(i * lightStep + speed) * 10
-    pointLightsPositions[i][1] = Math.sin(i * lightStep + speed) * 10
-    pointLightsPositions[i][2] = Math.cos(speed) + 2 + 4
+
+    const lightPos = [
+      Math.cos(i * lightStep + speed) * 10,
+      Math.sin(i * lightStep + speed) * 10,
+      Math.cos(speed) + 2 + 4,
+    ]
+
+    pointLightsPositions[i][0] = lightPos[0]
+    pointLightsPositions[i][1] = lightPos[1]
+    pointLightsPositions[i][2] = lightPos[2]
+
+    debugLights[i].setPosition(lightPos).updateWorldMatrix()
+
     gl.bufferSubData(
       gl.UNIFORM_BUFFER,
       lightingUBOInfo.uniforms.pointLightPositions.offset +

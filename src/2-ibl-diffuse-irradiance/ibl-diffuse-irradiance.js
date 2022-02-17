@@ -19,6 +19,7 @@ import Sphere from './sphere'
 import Label from './label'
 import CubemapConverter from './cubemap-converter'
 import Skybox from './skybox'
+import LightDebug from '../shared/light-debug'
 
 import hdrImageSrc0 from '../images/environment/MonValley_A_LookoutPoint_2k.hdr'
 import skyboxImageSrc0 from '../images/environment/MonValley_A_LookoutPoint_Thumb.jpg'
@@ -307,13 +308,19 @@ const postFXUBO = createAndBindUBOToBase(gl, postFXUBOInfo.blockSize, 3)
 
 const pointLightsPositions = []
 const pointLightsColors = []
+const lightDebuggers = []
 
 for (let i = 0; i < POINT_LIGHT_POSITIONS_COUNT; i++) {
   pointLightsPositions.push(new Float32Array(3))
 
-  pointLightsColors.push(
-    new Float32Array([Math.random(), Math.random(), Math.random()]),
-  )
+  const pointLight = [Math.random(), Math.random(), Math.random()]
+
+  pointLightsColors.push(new Float32Array(pointLight))
+
+  const lightDebug = new LightDebug(gl)
+  lightDebug.color = [...pointLight, 1]
+  scene.addChild(lightDebug)
+  lightDebuggers.push(lightDebug)
 }
 
 // we will project the equirectangular texture to this unit cube, place a camera inside and
@@ -407,14 +414,23 @@ function drawFrame(ts) {
     0,
   )
 
-  // Lighing UBO
+  // Lighing UBO and light debuggers
   gl.bindBuffer(gl.UNIFORM_BUFFER, lightingUBO)
   const speed = ts * 0.001
   for (let i = 0; i < POINT_LIGHT_POSITIONS_COUNT; i++) {
     const lightStep = (Math.PI * 2) / POINT_LIGHT_POSITIONS_COUNT
-    pointLightsPositions[i][0] = Math.cos(i * lightStep + speed) * 10
-    pointLightsPositions[i][1] = Math.sin(i * lightStep + speed) * 10
-    pointLightsPositions[i][2] = Math.cos(speed) + 2 + 4
+
+    const lightPos = [
+      Math.cos(i * lightStep + speed) * (Math.sin(speed) * 3 + 6),
+      Math.sin(i * lightStep + speed) * (Math.sin(speed) * 3 + 6),
+      Math.cos(speed) * 10,
+    ]
+    pointLightsPositions[i][0] = lightPos[0]
+    pointLightsPositions[i][1] = lightPos[1]
+    pointLightsPositions[i][2] = lightPos[2]
+
+    lightDebuggers[i].setPosition(lightPos).updateWorldMatrix()
+
     gl.bufferSubData(
       gl.UNIFORM_BUFFER,
       lightingUBOInfo.uniforms.pointLightPositions.offset +
