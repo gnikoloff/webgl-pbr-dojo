@@ -1,4 +1,4 @@
-var K=Object.defineProperty;var A=Object.getOwnPropertySymbols;var J=Object.prototype.hasOwnProperty,Z=Object.prototype.propertyIsEnumerable;var P=(o,n,e)=>n in o?K(o,n,{enumerable:!0,configurable:!0,writable:!0,value:e}):o[n]=e,O=(o,n)=>{for(var e in n||(n={}))J.call(n,e)&&P(o,e,n[e]);if(A)for(var e of A(n))Z.call(n,e)&&P(o,e,n[e]);return o};var y=(o,n,e)=>(P(o,typeof n!="symbol"?n+"":n,e),e),D=(o,n,e)=>{if(!n.has(o))throw TypeError("Cannot "+e)};var h=(o,n,e)=>(D(o,n,"read from private field"),e?e.call(o):n.get(o)),x=(o,n,e)=>{if(n.has(o))throw TypeError("Cannot add the same private member more than once");n instanceof WeakSet?n.add(o):n.set(o,e)},g=(o,n,e,r)=>(D(o,n,"write to private field"),r?r.call(o,e):n.set(o,e),e);import{t as nn}from"./assets/vendor.19aed32e.js";import{D as tn,O as en,P as on,C as an,c as rn,a as ln,S as sn,b,d as S}from"./assets/index.75855a8b.js";var cn=`#version 300 es
+var K=Object.defineProperty;var A=Object.getOwnPropertySymbols;var J=Object.prototype.hasOwnProperty,Z=Object.prototype.propertyIsEnumerable;var P=(o,n,e)=>n in o?K(o,n,{enumerable:!0,configurable:!0,writable:!0,value:e}):o[n]=e,O=(o,n)=>{for(var e in n||(n={}))J.call(n,e)&&P(o,e,n[e]);if(A)for(var e of A(n))Z.call(n,e)&&P(o,e,n[e]);return o};var y=(o,n,e)=>(P(o,typeof n!="symbol"?n+"":n,e),e),D=(o,n,e)=>{if(!n.has(o))throw TypeError("Cannot "+e)};var h=(o,n,e)=>(D(o,n,"read from private field"),e?e.call(o):n.get(o)),x=(o,n,e)=>{if(n.has(o))throw TypeError("Cannot add the same private member more than once");n instanceof WeakSet?n.add(o):n.set(o,e)},g=(o,n,e,r)=>(D(o,n,"write to private field"),r?r.call(o,e):n.set(o,e),e);import{t as nn}from"./assets/vendor.adb55ed6.js";import{D as tn,O as en,P as on,C as an,c as rn,a as ln,S as sn,b,d as S}from"./assets/index.18c89447.js";var cn=`#version 300 es
 
 -- DEFINES_HOOK --
 
@@ -319,7 +319,6 @@ in vec3 vWorldPos;
 out vec4 finalColor;
 
 void main () {
-  
 
   #ifdef USE_PBR
     vec3 V = normalize(cameraPosition - vWorldPos);

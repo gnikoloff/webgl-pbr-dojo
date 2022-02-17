@@ -1,6 +1,8 @@
 import { defineConfig, loadEnv } from 'vite'
 import glsl from 'vite-plugin-glsl'
 
+import EXAMPLES from './EXAMPLES.json'
+
 export default ({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) }
 
@@ -18,11 +20,7 @@ export default ({ mode }) => {
         },
         input: process.env.DEV
           ? ''
-          : [
-              'src/0-pbr-basics/pbr-basics.js',
-              'src/1-textured-pbr/textured-pbr.js',
-              'src/2-ibl-irradiance-conversion/ibl-irradiance-conversion.js',
-            ],
+          : EXAMPLES.map(({ id }, i) => `src/${i}-${id}/${id}.js`),
       },
     },
   })
