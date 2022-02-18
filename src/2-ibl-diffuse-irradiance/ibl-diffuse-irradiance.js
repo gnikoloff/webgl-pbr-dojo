@@ -33,9 +33,7 @@ import SKYBOX_FRAGMENT_SHADER_SRC from './shaders/skybox.frag'
 import EQIORECTANGULAR_TO_CUBEMAP_FRAGMENT_SHADER_SRC from './shaders/equirectangular-to-cubemap.frag'
 import SPHERE_FRAGMENT_SHADER_SRC from './shaders/sphere.frag'
 import LABEL_FRAGMENT_SHADER_SRC from './shaders/label.frag'
-// this demo takes in already convoluted irradiance map,
-// hence no need for a manual step with a manual convolution shader!
-import CONVOLUTE_CUBEMAP_FRAGMENT_SHADER_SRC from './shaders/convolute-cubemap.frag'
+import CONVOLUTE_IRRADIANCE_MAP_FRAGMENT_SHADER_SRC from './shaders/convolute-irradiance-map.frag'
 
 const SPHERE_GRID_X_COUNT = 7
 const SPHERE_GRID_Y_COUNT = 7
@@ -340,7 +338,7 @@ const cubemapToIrradiance = new CubemapConverter(
   gl,
   cubemapGeometry,
   UBER_VERTEX_SHADER_SRC,
-  CONVOLUTE_CUBEMAP_FRAGMENT_SHADER_SRC,
+  CONVOLUTE_IRRADIANCE_MAP_FRAGMENT_SHADER_SRC,
 )
 cubemapToIrradiance.setUniform('u_environmentMap', { type: gl.INT, value: 0 })
 
