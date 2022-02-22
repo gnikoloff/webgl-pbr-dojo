@@ -14,50 +14,6 @@
   </head>
   <body>
     <div id="app"></div>
-    <!-- <script type="module" src="/src/0-pbr-basics/pbr-basics.js"></script> -->
-    <!-- <script type="module" src="/src/1-textured-pbr/textured-pbr.js"></script> -->
-    <!-- <script
-      type="module"
-      src="/src/2-ibl-diffuse-irradiance/ibl-diffuse-irradiance.js"
-    ></script> -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script>
-      /**
-       * @author amakaseev / https://github.com/amakaseev
-       *
-       * for description see https://www.khronos.org/opengles/sdk/tools/KTX/
-       * for file layout see https://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/
-       *
-       * ported from https://github.com/BabylonJS/Babylon.js/blob/master/src/Tools/babylon.khronosTextureContainer.ts
-       */
-
-      THREE.KTXLoader = function (manager) {
-        // THREE.CompressedTextureLoader.call(this, manager)
-      }
-
-      THREE.KTXLoader.prototype = Object.assign(
-        Object.create(THREE.CompressedTextureLoader.prototype),
-        {
-          constructor: THREE.KTXLoader,
-
-          parse: function (buffer, loadMipmaps) {
-            var ktx = new KhronosTextureContainer(buffer, 1)
-
-            return {
-              mipmaps: ktx.mipmaps(loadMipmaps),
-              width: ktx.pixelWidth,
-              height: ktx.pixelHeight,
-              format: ktx.glInternalFormat,
-              isCubemap: ktx.numberOfFaces === 6,
-              mipmapCount: ktx.numberOfMipmapLevels,
-            }
-          },
-        },
-      )
-    </script>
-    <script
-      type="module"
-      src="/src/3-ibl-specular-radiance/ibl-specular-radiance.js"
-    ></script>
+    <script type="module" src="/src/0-pbr-basics/pbr-basics.js"></script>
   </body>
 </html>

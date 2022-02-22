@@ -621,3 +621,7 @@ function onResize() {
   canvas.style.setProperty('width', `${innerWidth}px`)
   canvas.style.setProperty('height', `${innerHeight}px`)
 }
+
+function transformAssetSrc(src) {
+  return window.BASE_URL ? `${window.BASE_URL}/assets/${src}` : src
+}
