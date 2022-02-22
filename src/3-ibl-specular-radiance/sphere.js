@@ -10,23 +10,24 @@ export default class Sphere extends Drawable {
   irradianceMapTexture
   prefilterMapTexture
   brdfLutTexture
-  envMapTexture
+
+  // PBR textures
+  albedoMap
+  normalMap
+  metallicMap
+  roughnessMap
+  aoMap
 
   constructor(gl, geometry, vsShader, fsShader, defines) {
-    super(
-      gl,
-      vsShader,
-      fsShader,
-      {
-        PI: Math.PI,
-        USE_NORMAL: true,
-        USE_WORLD_POS: true,
-        USE_PBR: true,
-        MAX_REFLECTION_LOD: 4,
-        ...defines,
-      },
-      'sphere',
-    )
+    const newDefines = {
+      PI: Math.PI,
+      USE_NORMAL: true,
+      USE_WORLD_POS: true,
+      USE_PBR: true,
+      MAX_REFLECTION_LOD: 4,
+      ...defines,
+    }
+    super(gl, vsShader, fsShader, newDefines, 'sphere')
 
     const { vertexCount, vertexStride, interleavedArray, indicesArray } =
       geometry
@@ -35,7 +36,6 @@ export default class Sphere extends Drawable {
 
     const aPosition = gl.getAttribLocation(this.program, 'aPosition')
     const aNormal = gl.getAttribLocation(this.program, 'aNormal')
-    // const aUv = gl.getAttribLocation(this.program, 'aUv')
 
     const interleavedBuffer = gl.createBuffer()
     const indexBuffer = gl.createBuffer()
@@ -65,15 +65,18 @@ export default class Sphere extends Drawable {
       3 * Float32Array.BYTES_PER_ELEMENT,
     )
 
-    // gl.enableVertexAttribArray(aUv)
-    // gl.vertexAttribPointer(
-    //   aUv,
-    //   2,
-    //   gl.FLOAT,
-    //   false,
-    //   vertexStride * Float32Array.BYTES_PER_ELEMENT,
-    //   6 * Float32Array.BYTES_PER_ELEMENT,
-    // )
+    if (defines.USE_PBR_TEXTURES) {
+      const aUv = gl.getAttribLocation(this.program, 'aUv')
+      gl.enableVertexAttribArray(aUv)
+      gl.vertexAttribPointer(
+        aUv,
+        2,
+        gl.FLOAT,
+        false,
+        vertexStride * Float32Array.BYTES_PER_ELEMENT,
+        6 * Float32Array.BYTES_PER_ELEMENT,
+      )
+    }
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer)
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indicesArray, gl.STATIC_DRAW)
@@ -81,10 +84,7 @@ export default class Sphere extends Drawable {
     this.gl.bindVertexArray(null)
 
     this.updateUniform('u_worldMatrix', this.worldMatrix)
-    this.setUniform('u_albedo', {
-      type: gl.FLOAT_VEC3,
-      value: new Float32Array([1, 0, 0]),
-    })
+
     this.setUniform('u_irradianceMap', {
       type: gl.INT,
       value: 0,
@@ -97,6 +97,18 @@ export default class Sphere extends Drawable {
       type: gl.INT,
       value: 2,
     })
+    if (defines.USE_PBR_TEXTURES) {
+      this.setUniform('u_albedoMap', { type: gl.INT, value: 3 })
+      this.setUniform('u_normalMap', { type: gl.INT, value: 4 })
+      this.setUniform('u_metallicMap', { type: gl.INT, value: 5 })
+      this.setUniform('u_roughnessMap', { type: gl.INT, value: 6 })
+      this.setUniform('u_aoMap', { type: gl.INT, value: 7 })
+    } else {
+      this.setUniform('u_albedo', {
+        type: gl.FLOAT_VEC3,
+        value: new Float32Array([1, 1, 1]),
+      })
+    }
 
     this.#projectionUBOIndex = gl.getUniformBlockIndex(
       this.program,
@@ -117,24 +129,41 @@ export default class Sphere extends Drawable {
     this.gl.uniformBlockBinding(this.program, this.#postFXUBOIndex, 3)
     this.gl.useProgram(this.program)
 
+    // bind IBL textures
     if (this.irradianceMapTexture) {
       this.gl.activeTexture(this.gl.TEXTURE0)
       this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP, this.irradianceMapTexture)
     }
-
     if (this.prefilterMapTexture) {
       this.gl.activeTexture(this.gl.TEXTURE1)
       this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP, this.prefilterMapTexture)
     }
-
     if (this.brdfLutTexture) {
       this.gl.activeTexture(this.gl.TEXTURE2)
       this.gl.bindTexture(this.gl.TEXTURE_2D, this.brdfLutTexture)
     }
 
-    if (this.envMapTexture) {
+    // bind PBR textures
+    if (this.albedoMap) {
       this.gl.activeTexture(this.gl.TEXTURE3)
-      this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP, this.envMapTexture)
+      this.gl.bindTexture(this.gl.TEXTURE_2D, this.albedoMap)
+    }
+
+    if (this.normalMap) {
+      this.gl.activeTexture(this.gl.TEXTURE4)
+      this.gl.bindTexture(this.gl.TEXTURE_2D, this.normalMap)
+    }
+    if (this.metallicMap) {
+      this.gl.activeTexture(this.gl.TEXTURE5)
+      this.gl.bindTexture(this.gl.TEXTURE_2D, this.metallicMap)
+    }
+    if (this.roughnessMap) {
+      this.gl.activeTexture(this.gl.TEXTURE6)
+      this.gl.bindTexture(this.gl.TEXTURE_2D, this.roughnessMap)
+    }
+    if (this.aoMap) {
+      this.gl.activeTexture(this.gl.TEXTURE7)
+      this.gl.bindTexture(this.gl.TEXTURE_2D, this.aoMap)
     }
 
     this.gl.bindVertexArray(this.vao)

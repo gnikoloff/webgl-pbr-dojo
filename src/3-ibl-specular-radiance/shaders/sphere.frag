@@ -12,10 +12,19 @@ precision highp float;
 #include pbr/geometry-smith.glsl;
 #include pbr/hammersley.glsl;
 #include pbr/importance-sample-ggx.glsl;
+#include pbr/get-normal-from-map.glsl;
 
-uniform vec3 u_albedo;
-uniform float u_metallic;
-uniform float u_roughness;
+#ifdef USE_PBR_TEXTURES
+  uniform sampler2D u_albedoMap;
+  uniform sampler2D u_normalMap;
+  uniform sampler2D u_metallicMap;
+  uniform sampler2D u_roughnessMap;
+  uniform sampler2D u_aoMap;
+#else
+  uniform vec3 u_albedo;
+  uniform float u_metallic;
+  uniform float u_roughness;
+#endif
 
 uniform samplerCube u_irradianceMap;
 uniform samplerCube u_prefilterMap;
@@ -24,17 +33,40 @@ uniform sampler2D u_brdfLUT;
 in vec3 vNormal;
 in vec3 vWorldPos;
 
+#ifdef USE_UV
+  in vec2 vUv;
+#endif
+
 out vec4 finalColor;
 
 void main () {
-  vec3 N = normalize(vNormal);
+  vec3 albedo = vec3(0.0);
+  float metallic = 0.0;
+  float roughness = 0.0;
+  float ao = 0.0;
+  vec3 N = vec3(0.0);
+
+  #ifdef USE_PBR_TEXTURES
+    albedo = texture(u_albedoMap, vUv).rgb;
+    metallic = texture(u_metallicMap, vUv).r;
+    roughness = texture(u_roughnessMap, vUv).r;
+    ao = texture(u_aoMap, vUv).r;
+    N = getNormalFromMap(u_normalMap, vUv, normalize(vNormal), vWorldPos);
+  #else
+    albedo = u_albedo;
+    metallic = u_metallic;
+    roughness = u_roughness;
+    ao = 1.0;
+    N = normalize(vNormal);
+  #endif
+
   vec3 V = normalize(cameraPosition - vWorldPos);
 
   float NdotV = max(dot(N, V), 0.0000001); // min of 0.0000001 to prevent divide by 0
 
   // calculate reflectance at normal incidence, if diaelectric (like plastic) use
   // baseReflectivity of 0.04; if its metal, use the albedo color as baseReflectivity
-  vec3 F0 = mix(vec3(0.04), u_albedo, u_metallic);
+  vec3 F0 = mix(vec3(0.04), albedo, metallic);
 
   // output luminance to add to
   vec3 Lo = vec3(0.0);
@@ -59,9 +91,9 @@ void main () {
     float NdotH = max(dot(N, H), 0.0);
       
     // larger the more micro-facets are aligned to H (normal distribution function)
-    float D = DistributionGGX(N, H, u_roughness);
+    float D = DistributionGGX(N, H, roughness);
     // smaller the more micro-facets shadowed by other micro facets
-    float G = GeometrySmith(N, V, L, u_roughness);
+    float G = GeometrySmith(N, V, L, roughness);
     // Fresnel-Schlick
     // proportion of specular reflectance
     vec3 F = fresnelSchlick(HdotV, F0);
@@ -69,28 +101,28 @@ void main () {
     // energy preservation! specular + diffuse can not excceed 1 (can't emit more light than they receive)
     vec3 kS = F;
     vec3 kD = vec3(1.0) - kS;
-    kD *= 1.0 - u_metallic;
+    kD *= 1.0 - metallic;
     
-    vec3 specular = D * G * F;
-    specular /= 4.0 * NdotV * NdotL;
+    float denominator = 4.0 * NdotV * NdotL;
+    vec3 specular = (D * G * F) / denominator;  
         
     // add to outgoing radiance Lo
-    Lo += (kD * u_albedo / PI + specular) * radiance * NdotL; 
+    Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
   }
 
-  vec3 F = fresnelSchlickRoughness(NdotV, F0, u_roughness);
+  vec3 F = fresnelSchlickRoughness(NdotV, F0, roughness);
 
   vec3 kS = F;
   vec3 kD = 1.0 - kS;
-  kD *= 1.0 - u_metallic;	  
+  kD *= 1.0 - metallic;	  
     
   vec3 irradiance = texture(u_irradianceMap, N).rgb;
-  vec3 diffuse    = irradiance * u_albedo;
+  vec3 diffuse = irradiance * albedo;
 
   vec3 R = reflect(-V, N);
     
-  vec3 prefilteredColor = textureLod(u_prefilterMap, R, u_roughness * MAX_REFLECTION_LOD).rgb;   
-  vec2 envBRDF  = texture(u_brdfLUT, vec2(NdotV, u_roughness)).rg;
+  vec3 prefilteredColor = textureLod(u_prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;   
+  vec2 envBRDF  = texture(u_brdfLUT, vec2(NdotV, roughness)).rg;
   vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
 
   // vec3 ambient = vec3(0.03) * albedo * ao;
@@ -99,12 +131,12 @@ void main () {
   // irradiance map
   vec3 irradiancekS = fresnelSchlick(max(dot(N, V), 0.0), F0);
   vec3 irradiancekD = 1.0 - irradiancekS;
-  irradiancekD *= 1.0 - u_metallic;
+  irradiancekD *= 1.0 - metallic;
   vec3 irradianceFromMap = texture(u_irradianceMap, N).rgb;
-  vec3 diffuseFromMap = irradianceFromMap * u_albedo;
+  vec3 diffuseFromMap = irradianceFromMap * albedo;
   
-  vec3 ambient = mix(vec3(0.03) * u_albedo, kD * diffuse, diffuseEnvLightMixFactor);
-  ambient = mix(ambient, irradiancekD * diffuseFromMap + specular, specularEnvLightMixFactor);
+  vec3 ambient = mix(vec3(0.03) * albedo * ao, kD * diffuse * ao, diffuseEnvLightMixFactor);
+  ambient = mix(ambient, (irradiancekD * diffuseFromMap + specular) * ao, specularEnvLightMixFactor);
 
   // vec3 I = normalize(vWorldPos - cameraPosition);
   // vec3 R = reflect(I, N);

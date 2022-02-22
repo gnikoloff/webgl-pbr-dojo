@@ -9,7 +9,7 @@
     "url": "https://georgi-nikolov.com"
   },
   "scripts": {
-    "dev": "DEV=1 vite",
+    "dev": "DEV=1 vite --host",
     "build": "vite build",
     "preview": "vite preview",
     "clean:examples": "del site/examples/** !site/examples/",
@@ -29,6 +29,8 @@
   },
   "dependencies": {
     "copy": "^0.3.2",
+    "ktx-parse": "^0.2.2",
+    "spectorjs": "^0.9.27",
     "tweakpane": "^3.0.7",
     "tweakpane-plugin-thumbnail-list": "^0.3.0"
   }

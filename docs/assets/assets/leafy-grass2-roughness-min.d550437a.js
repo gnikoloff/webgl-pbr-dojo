@@ -1,0 +1,1 @@
+var a="/rustediron2_basecolor.png",r="/rustediron2_ao.png",s="/rustediron2_metallic.png",n="/rustediron2_normal.png",e="/rustediron2_roughness.png",o="/leafy-grass2-albedo-min.png",g="/leafy-grass2-ao-min.png",p="/vintage-tile1_metallic-min.png",l="/leafy-grass2-normal-ogl-min.png",i="/leafy-grass2-roughness-min.png";export{a,r as b,o as c,l as d,p as e,i as f,g,s as m,n,e as r};

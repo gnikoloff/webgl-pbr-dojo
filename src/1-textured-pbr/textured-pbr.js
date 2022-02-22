@@ -10,26 +10,107 @@ import {
   OrthographicCamera,
 } from '../lib/hwoa-rang-gl2'
 
+import loadCorrectCompressedTexture from '../shared/load-correct-compressed-texture'
+
 import Sphere from './sphere'
 import LightDebug from '../shared/light-debug'
 
-import abedoMap0 from '../images/pbr/vintage/vintage-tile1_albedo-min.png'
-import aoMap0 from '../images/pbr/vintage/vintage-tile1_ao-min.png'
-import metallicMap0 from '../images/pbr/vintage/vintage-tile1_metallic-min.png'
-import normalMap0 from '../images/pbr/vintage/vintage-tile1_normal-ogl-min.png'
-import roughnessMap0 from '../images/pbr/vintage/vintage-tile1_roughness-min.png'
+// PBR compressed textures - S3TC, ASTC, ETC1, ETC2, PVRTC
+// PBR 1
+// albedo
+import albedoMap0S3TC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-albedo_s3tc.ktx'
+import albedoMap0ASTC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-albedo_astc.ktx'
+import albedoMap0ETC1 from '../images/pbr/worn-shiny-metal/worn-shiny-metal-albedo_etc1.ktx'
+import albedoMap0ETC2 from '../images/pbr/worn-shiny-metal/worn-shiny-metal-albedo_etc2.ktx'
+import albedoMap0PVRTC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-albedo_pvrtc.ktx'
+// ao
+import aoMap0S3TC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-ao_s3tc.ktx'
+import aoMap0ASTC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-ao_astc.ktx'
+import aoMap0ETC1 from '../images/pbr/worn-shiny-metal/worn-shiny-metal-ao_etc1.ktx'
+import aoMap0ETC2 from '../images/pbr/worn-shiny-metal/worn-shiny-metal-ao_etc2.ktx'
+import aoMap0PVRTC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-ao_pvrtc.ktx'
+// normal
+import normalMap0S3TC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Normal-ogl_s3tc.ktx'
+import normalMap0ASTC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Normal-ogl_astc.ktx'
+import normalMap0ETC1 from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Normal-ogl_etc1.ktx'
+import normalMap0ETC2 from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Normal-ogl_etc2.ktx'
+import normalMap0PVRTC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Normal-ogl_pvrtc.ktx'
+// metallic
+import metallicMap0S3TC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Metallic_s3tc.ktx'
+import metallicMap0ASTC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Metallic_astc.ktx'
+import metallicMap0ETC1 from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Metallic_etc1.ktx'
+import metallicMap0ETC2 from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Metallic_etc2.ktx'
+import metallicMap0PVRTC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Metallic_pvrtc.ktx'
+// roughness
+import roughnessMap0S3TC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Roughness_s3tc.ktx'
+import roughnessMap0ASTC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Roughness_astc.ktx'
+import roughnessMap0ETC1 from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Roughness_etc1.ktx'
+import roughnessMap0ETC2 from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Roughness_etc2.ktx'
+import roughnessMap0PVRTC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Roughness_pvrtc.ktx'
 
-import abedoMap1 from '../images/pbr/rust/rustediron2_basecolor.png'
-import aoMap1 from '../images/pbr/rust/rustediron2_ao.png'
-import metallicMap1 from '../images/pbr/rust/rustediron2_metallic.png'
-import normalMap1 from '../images/pbr/rust/rustediron2_normal.png'
-import roughnessMap1 from '../images/pbr/rust/rustediron2_roughness.png'
+// PBR 2
+// albedo
+import albedoMap1S3TC from '../images/pbr/rust/rustediron2_basecolor_s3tc.ktx'
+import albedoMap1ASTC from '../images/pbr/rust/rustediron2_basecolor_astc.ktx'
+import albedoMap1ETC1 from '../images/pbr/rust/rustediron2_basecolor_etc1.ktx'
+import albedoMap1ETC2 from '../images/pbr/rust/rustediron2_basecolor_etc2.ktx'
+import albedoMap1PVRTC from '../images/pbr/rust/rustediron2_basecolor_pvrtc.ktx'
+// ao
+import aoMap1S3TC from '../images/pbr/rust/rustediron2_ao_s3tc.ktx'
+import aoMap1ASTC from '../images/pbr/rust/rustediron2_ao_astc.ktx'
+import aoMap1ETC1 from '../images/pbr/rust/rustediron2_ao_etc1.ktx'
+import aoMap1ETC2 from '../images/pbr/rust/rustediron2_ao_etc2.ktx'
+import aoMap1PVRTC from '../images/pbr/rust/rustediron2_ao_pvrtc.ktx'
+// normal
+import normalMap1S3TC from '../images/pbr/rust/rustediron2_normal_s3tc.ktx'
+import normalMap1ASTC from '../images/pbr/rust/rustediron2_normal_astc.ktx'
+import normalMap1ETC1 from '../images/pbr/rust/rustediron2_normal_etc1.ktx'
+import normalMap1ETC2 from '../images/pbr/rust/rustediron2_normal_etc2.ktx'
+import normalMap1PVRTC from '../images/pbr/rust/rustediron2_normal_pvrtc.ktx'
+// metallic
+import metallicMap1S3TC from '../images/pbr/rust/rustediron2_metallic_s3tc.ktx'
+import metallicMap1ASTC from '../images/pbr/rust/rustediron2_metallic_astc.ktx'
+import metallicMap1ETC1 from '../images/pbr/rust/rustediron2_metallic_etc1.ktx'
+import metallicMap1ETC2 from '../images/pbr/rust/rustediron2_metallic_etc2.ktx'
+import metallicMap1PVRTC from '../images/pbr/rust/rustediron2_metallic_pvrtc.ktx'
+// roughness
+import roughnessMap1S3TC from '../images/pbr/rust/rustediron2_roughness_s3tc.ktx'
+import roughnessMap1ASTC from '../images/pbr/rust/rustediron2_roughness_astc.ktx'
+import roughnessMap1ETC1 from '../images/pbr/rust/rustediron2_roughness_etc1.ktx'
+import roughnessMap1ETC2 from '../images/pbr/rust/rustediron2_roughness_etc2.ktx'
+import roughnessMap1PVRTC from '../images/pbr/rust/rustediron2_roughness_pvrtc.ktx'
 
-import abedoMap2 from '../images/pbr/grass/leafy-grass2-albedo-min.png'
-import aoMap2 from '../images/pbr/grass/leafy-grass2-ao-min.png'
-import metallicMap2 from '../images/pbr/grass/leafy-grass2-metallic-min.png'
-import normalMap2 from '../images/pbr/grass/leafy-grass2-normal-ogl-min.png'
-import roughnessMap2 from '../images/pbr/grass/leafy-grass2-roughness-min.png'
+// PBR 3
+// albedo
+import albedoMap2S3TC from '../images/pbr/grass/leafy-grass2-albedo_s3tc.ktx'
+import albedoMap2ASTC from '../images/pbr/grass/leafy-grass2-albedo_astc.ktx'
+import albedoMap2ETC1 from '../images/pbr/grass/leafy-grass2-albedo_etc1.ktx'
+import albedoMap2ETC2 from '../images/pbr/grass/leafy-grass2-albedo_etc2.ktx'
+import albedoMap2PVRTC from '../images/pbr/grass/leafy-grass2-albedo_pvrtc.ktx'
+// ao
+import aoMap2S3TC from '../images/pbr/grass/leafy-grass2-ao_s3tc.ktx'
+import aoMap2ASTC from '../images/pbr/grass/leafy-grass2-ao_astc.ktx'
+import aoMap2ETC1 from '../images/pbr/grass/leafy-grass2-ao_etc1.ktx'
+import aoMap2ETC2 from '../images/pbr/grass/leafy-grass2-ao_etc2.ktx'
+import aoMap2PVRTC from '../images/pbr/grass/leafy-grass2-ao_pvrtc.ktx'
+// normal
+import normalMap2S3TC from '../images/pbr/grass/leafy-grass2-normal-ogl_s3tc.ktx'
+import normalMap2ASTC from '../images/pbr/grass/leafy-grass2-normal-ogl_astc.ktx'
+import normalMap2ETC1 from '../images/pbr/grass/leafy-grass2-normal-ogl_etc1.ktx'
+import normalMap2ETC2 from '../images/pbr/grass/leafy-grass2-normal-ogl_etc2.ktx'
+import normalMap2PVRTC from '../images/pbr/grass/leafy-grass2-normal-ogl_pvrtc.ktx'
+// metallic
+import metallicMap2S3TC from '../images/pbr/grass/leafy-grass2-metallic_s3tc.ktx'
+import metallicMap2ASTC from '../images/pbr/grass/leafy-grass2-metallic_astc.ktx'
+import metallicMap2ETC1 from '../images/pbr/grass/leafy-grass2-metallic_etc1.ktx'
+import metallicMap2ETC2 from '../images/pbr/grass/leafy-grass2-metallic_etc2.ktx'
+import metallicMap2PVRTC from '../images/pbr/grass/leafy-grass2-metallic_pvrtc.ktx'
+// roughness
+import roughnessMap2S3TC from '../images/pbr/grass/leafy-grass2-roughness_s3tc.ktx'
+import roughnessMap2ASTC from '../images/pbr/grass/leafy-grass2-roughness_astc.ktx'
+import roughnessMap2ETC1 from '../images/pbr/grass/leafy-grass2-roughness_etc1.ktx'
+import roughnessMap2ETC2 from '../images/pbr/grass/leafy-grass2-roughness_etc2.ktx'
+import roughnessMap2PVRTC from '../images/pbr/grass/leafy-grass2-roughness_pvrtc.ktx'
 
 const SPHERE_GRID_X_COUNT = 7
 const SPHERE_GRID_Y_COUNT = 7
@@ -48,25 +129,115 @@ const TONEMAPPING_MODES = [
 ]
 
 const PBR_TEXTURES_0 = [
-  abedoMap0,
-  normalMap0,
-  metallicMap0,
-  roughnessMap0,
-  aoMap0,
+  {
+    s3tc: transformAssetSrc(albedoMap0S3TC),
+    astc: transformAssetSrc(albedoMap0ASTC),
+    etc1: transformAssetSrc(albedoMap0ETC1),
+    etc2: transformAssetSrc(albedoMap0ETC2),
+    pvrtc: transformAssetSrc(albedoMap0PVRTC),
+  },
+  {
+    s3tc: transformAssetSrc(normalMap0S3TC),
+    astc: transformAssetSrc(normalMap0ASTC),
+    etc1: transformAssetSrc(normalMap0ETC1),
+    etc2: transformAssetSrc(normalMap0ETC2),
+    pvrtc: transformAssetSrc(normalMap0PVRTC),
+  },
+  {
+    s3tc: transformAssetSrc(metallicMap0S3TC),
+    astc: transformAssetSrc(metallicMap0ASTC),
+    etc1: transformAssetSrc(metallicMap0ETC1),
+    etc2: transformAssetSrc(metallicMap0ETC2),
+    pvrtc: transformAssetSrc(metallicMap0PVRTC),
+  },
+  {
+    s3tc: transformAssetSrc(roughnessMap0S3TC),
+    astc: transformAssetSrc(roughnessMap0ASTC),
+    etc1: transformAssetSrc(roughnessMap0ETC1),
+    etc2: transformAssetSrc(roughnessMap0ETC2),
+    pvrtc: transformAssetSrc(roughnessMap0PVRTC),
+  },
+  {
+    s3tc: transformAssetSrc(aoMap0S3TC),
+    astc: transformAssetSrc(aoMap0ASTC),
+    etc1: transformAssetSrc(aoMap0ETC1),
+    etc2: transformAssetSrc(aoMap0ETC2),
+    pvrtc: transformAssetSrc(aoMap0PVRTC),
+  },
 ]
 const PBR_TEXTURES_1 = [
-  abedoMap1,
-  normalMap1,
-  metallicMap1,
-  roughnessMap1,
-  aoMap1,
+  {
+    s3tc: transformAssetSrc(albedoMap1S3TC),
+    astc: transformAssetSrc(albedoMap1ASTC),
+    etc1: transformAssetSrc(albedoMap1ETC1),
+    etc2: transformAssetSrc(albedoMap1ETC2),
+    pvrtc: transformAssetSrc(albedoMap1PVRTC),
+  },
+  {
+    s3tc: transformAssetSrc(normalMap1S3TC),
+    astc: transformAssetSrc(normalMap1ASTC),
+    etc1: transformAssetSrc(normalMap1ETC1),
+    etc2: transformAssetSrc(normalMap1ETC2),
+    pvrtc: transformAssetSrc(normalMap1PVRTC),
+  },
+  {
+    s3tc: transformAssetSrc(metallicMap1S3TC),
+    astc: transformAssetSrc(metallicMap1ASTC),
+    etc1: transformAssetSrc(metallicMap1ETC1),
+    etc2: transformAssetSrc(metallicMap1ETC2),
+    pvrtc: transformAssetSrc(metallicMap1PVRTC),
+  },
+  {
+    s3tc: transformAssetSrc(roughnessMap1S3TC),
+    astc: transformAssetSrc(roughnessMap1ASTC),
+    etc1: transformAssetSrc(roughnessMap1ETC1),
+    etc2: transformAssetSrc(roughnessMap1ETC2),
+    pvrtc: transformAssetSrc(roughnessMap1PVRTC),
+  },
+  {
+    s3tc: transformAssetSrc(aoMap1S3TC),
+    astc: transformAssetSrc(aoMap1ASTC),
+    etc1: transformAssetSrc(aoMap1ETC1),
+    etc2: transformAssetSrc(aoMap1ETC2),
+    pvrtc: transformAssetSrc(aoMap1PVRTC),
+  },
 ]
 const PBR_TEXTURES_2 = [
-  abedoMap2,
-  normalMap2,
-  metallicMap2,
-  roughnessMap2,
-  aoMap2,
+  {
+    s3tc: transformAssetSrc(albedoMap2S3TC),
+    astc: transformAssetSrc(albedoMap2ASTC),
+    etc1: transformAssetSrc(albedoMap2ETC1),
+    etc2: transformAssetSrc(albedoMap2ETC2),
+    pvrtc: transformAssetSrc(albedoMap2PVRTC),
+  },
+  {
+    s3tc: transformAssetSrc(normalMap2S3TC),
+    astc: transformAssetSrc(normalMap2ASTC),
+    etc1: transformAssetSrc(normalMap2ETC1),
+    etc2: transformAssetSrc(normalMap2ETC2),
+    pvrtc: transformAssetSrc(normalMap2PVRTC),
+  },
+  {
+    s3tc: transformAssetSrc(metallicMap2S3TC),
+    astc: transformAssetSrc(metallicMap2ASTC),
+    etc1: transformAssetSrc(metallicMap2ETC1),
+    etc2: transformAssetSrc(metallicMap2ETC2),
+    pvrtc: transformAssetSrc(metallicMap2PVRTC),
+  },
+  {
+    s3tc: transformAssetSrc(roughnessMap2S3TC),
+    astc: transformAssetSrc(roughnessMap2ASTC),
+    etc1: transformAssetSrc(roughnessMap2ETC1),
+    etc2: transformAssetSrc(roughnessMap2ETC2),
+    pvrtc: transformAssetSrc(roughnessMap2PVRTC),
+  },
+  {
+    s3tc: transformAssetSrc(aoMap2S3TC),
+    astc: transformAssetSrc(aoMap2ASTC),
+    etc1: transformAssetSrc(aoMap2ETC1),
+    etc2: transformAssetSrc(aoMap2ETC2),
+    pvrtc: transformAssetSrc(aoMap2PVRTC),
+  },
 ]
 const tonemappingModeFloat32 = new Float32Array([1])
 const pointLightIntensityFloat32 = new Float32Array([48])
@@ -262,29 +433,29 @@ document.body.appendChild($loader)
 
 Promise.all([
   Promise.all(
-    PBR_TEXTURES_0.map((imageURL, i) =>
-      loadGLTextureFromImage(imageURL, i === 0 ? gl.SRGBA : gl.RGB),
+    PBR_TEXTURES_0.map((imageURLs, i) =>
+      loadCorrectCompressedTexture(gl, imageURLs),
     ),
   ),
   Promise.all(
-    PBR_TEXTURES_1.map((imageURL, i) =>
-      loadGLTextureFromImage(imageURL, i === 0 ? gl.SRGBA : gl.RGB),
+    PBR_TEXTURES_1.map((imageURLs, i) =>
+      loadCorrectCompressedTexture(gl, imageURLs),
     ),
   ),
   Promise.all(
-    PBR_TEXTURES_2.map((imageURL, i) =>
-      loadGLTextureFromImage(imageURL, i === 0 ? gl.SRGBA : gl.RGB),
+    PBR_TEXTURES_2.map((imageURLs, i) =>
+      loadCorrectCompressedTexture(gl, imageURLs),
     ),
   ),
 ]).then((texturePacks) => {
   let texIdx = 0
-  spheres.forEach((sphere, i) => {
+  for (const sphere of spheres) {
     sphere.textures = texturePacks[texIdx]
     texIdx++
     if (texIdx === 3) {
       texIdx = 0
     }
-  })
+  }
   $loader.parentNode.removeChild($loader)
 })
 // .then((textures) => {

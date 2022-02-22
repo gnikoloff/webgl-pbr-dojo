@@ -6,6 +6,7 @@ precision highp float;
 #include shared/ubos.glsl;
 #include pbr/hammersley.glsl;
 #include pbr/importance-sample-ggx.glsl;
+#include pbr/distribution-ggx.glsl;
 
 uniform samplerCube u_environmentMap;
 uniform float u_roughness;
@@ -29,7 +30,18 @@ void main () {
 
     float NdotL = max(dot(N, L), 0.0);
     if(NdotL > 0.0) {
-      prefilteredColor += texture(u_environmentMap, L).rgb * NdotL;
+      // remove bright dots in the pre-filter convolution
+      float NdotH = max(dot(N, H), 0.0);
+      float HdotV = max(dot(H, V), 0.0);
+      float D = DistributionGGX(N, H, u_roughness);
+      float pdf = (D * NdotH / (4.0 * HdotV)) + 0.0001;
+
+      float resolution = CUBEMAP_SIDE_SIZE; // resolution of source cubemap (per face)
+      float saTexel  = 4.0 * PI / (6.0 * resolution * resolution);
+      float saSample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.0001);
+
+      float mipLevel = u_roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel); 
+      prefilteredColor += textureLod(u_environmentMap, L, mipLevel).rgb * NdotL;
       totalWeight += NdotL;
     }
   }
