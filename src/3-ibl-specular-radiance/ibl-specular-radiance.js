@@ -1,4 +1,4 @@
-import { Spector } from 'spectorjs'
+// import { Spector } from 'spectorjs'
 import { Pane } from 'tweakpane'
 import * as TweakpaneThumbnailListPlugin from 'tweakpane-plugin-thumbnail-list'
 
@@ -28,7 +28,7 @@ import BRDFIntegrationPlane from './bdrf-integration-plane'
 import LightDebug from '../shared/light-debug'
 import PlaneDebug from '../shared/plane-debug'
 
-import ToHalfFloatWebWorker from '../shared/to-half-float-web-worker?worker'
+// import ToHalfFloatWebWorker from '../shared/to-half-float-web-worker?worker'
 
 // IBL environment
 import hdrImageSrc0 from '../images/environment/MonValley_A_LookoutPoint_2k.hdr'
@@ -306,8 +306,8 @@ const TWEAK_PARAMS = {
   image: 'mon-valley',
 }
 
-const spector = new Spector()
-spector.displayUI()
+// const spector = new Spector()
+// spector.displayUI()
 
 const tonemappingModeFloat32 = new Float32Array([2])
 const pointLightIntensityFloat32 = new Float32Array([16])
@@ -383,7 +383,7 @@ pane
     myHDR.src = transformAssetSrc(SKYBOX_IMAGE_SOURCES.get(value))
   })
 
-const toHalfWorker = new ToHalfFloatWebWorker()
+// const toHalfWorker = new ToHalfFloatWebWorker()
 
 const canvas = document.createElement('canvas')
 document.body.appendChild(canvas)
@@ -664,10 +664,15 @@ gl.getExtension('OES_texture_half_float')
 gl.getExtension('OES_texture_half_float_linear')
 
 loadHDRImage(hdrImageSrc2).then((hdrTexture) => {
-  toHalfWorker.postMessage(
-    [hdrTexture.width, hdrTexture.height, hdrTexture.dataFloat],
-    [hdrTexture.dataFloat.buffer],
-  )
+  // toHalfWorker.postMessage(
+  //   [hdrTexture.width, hdrTexture.height, hdrTexture.dataFloat],
+  //   [hdrTexture.dataFloat.buffer],
+  // )
+  convoluteHDREnvironment([
+    hdrTexture.width,
+    hdrTexture.height,
+    hdrTexture.dataFloat,
+  ])
 })
 
 Promise.all([
@@ -702,9 +707,6 @@ Promise.all([
   }
 })
 
-toHalfWorker.onmessage = (e) => {
-  convoluteHDREnvironment(e.data)
-}
 requestAnimationFrame(drawFrame)
 onResize()
 window.addEventListener('resize', onResize)
@@ -846,7 +848,7 @@ function convoluteHDREnvironment([width, height, imageData]) {
     height,
     0,
     gl.RGB,
-    gl.HALF_FLOAT,
+    gl.FLOAT,
     imageData,
   )
 
