@@ -378,7 +378,11 @@ pane
   .on('change', ({ value: { value } }) => {
     const myHDR = new HDRImage()
     myHDR.onload = () => {
-      convoluteHDREnvironment(myHDR)
+      convoluteHDREnvironment([
+        hdrTexture.width,
+        hdrTexture.height,
+        hdrTexture.dataFloat,
+      ])
     }
     myHDR.src = transformAssetSrc(SKYBOX_IMAGE_SOURCES.get(value))
   })
