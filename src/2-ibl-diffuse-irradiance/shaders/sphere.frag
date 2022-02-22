@@ -67,8 +67,8 @@ void main () {
     vec3 kD = vec3(1.0) - kS;
     kD *= 1.0 - u_metallic;
     
-    vec3 specular = D * G * F;
-    specular /= 4.0 * NdotV * NdotL;
+    float denominator = 4.0 * NdotV * NdotL;
+    vec3 specular = (D * G * F) / denominator;  
         
     // add to outgoing radiance Lo
     Lo += (kD * u_albedo / PI + specular) * radiance * NdotL; 
