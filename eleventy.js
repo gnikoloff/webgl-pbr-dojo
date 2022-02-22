@@ -12,7 +12,7 @@ module.exports = function (eleventyConfig) {
       output: 'docs',
       layouts: '_layouts',
     },
-    pathPrefix: '/webgl-pbr',
+    pathPrefix: '/webgl-pbr-dojo',
     passthroughFileCopy: true,
   }
 }
