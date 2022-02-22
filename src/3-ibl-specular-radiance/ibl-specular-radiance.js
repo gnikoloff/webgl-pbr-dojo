@@ -903,7 +903,11 @@ function convoluteHDREnvironment([width, height, imageData]) {
   gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
   gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
   gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_R, gl.CLAMP_TO_EDGE)
-  gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+  gl.texParameteri(
+    gl.TEXTURE_CUBE_MAP,
+    gl.TEXTURE_MIN_FILTER,
+    gl.LINEAR_MIPMAP_LINEAR,
+  )
   gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
 
   // lets capture the equirectangular 2D texture onto the equirectangularToCubemap faces
@@ -932,131 +936,131 @@ function convoluteHDREnvironment([width, height, imageData]) {
   // we need to generate mipmaps and use trilinear filtering on the environment map
   // to remove bright dots in the pre-filter convolution
   // see https://learnopengl.com/PBR/IBL/Specular-IBL
-  // gl.generateMipmap(gl.TEXTURE_CUBE_MAP)
+  gl.generateMipmap(gl.TEXTURE_CUBE_MAP)
 
-  // // After generating the HDR cubemap, we need to convolute it to a 32x32 irradiance map
-  // // cubemapToIrradiance.envTexture = cubemapTexture
+  // After generating the HDR cubemap, we need to convolute it to a 32x32 irradiance map
+  cubemapToIrradiance.envTexture = cubemapTexture
 
-  // // const irradianceCubeTexSize = 32
-  // // const irradianceTexture = gl.createTexture()
-  // // gl.bindTexture(gl.TEXTURE_CUBE_MAP, irradianceTexture)
-  // // for (let i = 0; i < 6; i++) {
-  // //   gl.texImage2D(
-  // //     gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
-  // //     0,
-  // //     gl.RGBA16F,
-  // //     irradianceCubeTexSize,
-  // //     irradianceCubeTexSize,
-  // //     0,
-  // //     gl.RGBA,
-  // //     gl.HALF_FLOAT,
-  // //     null,
-  // //   )
-  // // }
-  // // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-  // // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-  // // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_R, gl.CLAMP_TO_EDGE)
-  // // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-  // // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+  const irradianceCubeTexSize = 32
+  const irradianceTexture = gl.createTexture()
+  gl.bindTexture(gl.TEXTURE_CUBE_MAP, irradianceTexture)
+  for (let i = 0; i < 6; i++) {
+    gl.texImage2D(
+      gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
+      0,
+      gl.RGBA16F,
+      irradianceCubeTexSize,
+      irradianceCubeTexSize,
+      0,
+      gl.RGBA,
+      gl.HALF_FLOAT,
+      null,
+    )
+  }
+  gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+  gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+  gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_R, gl.CLAMP_TO_EDGE)
+  gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+  gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
 
-  // // // gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer)
-  // // gl.renderbufferStorage(
-  // //   gl.RENDERBUFFER,
-  // //   gl.DEPTH_COMPONENT16,
-  // //   irradianceCubeTexSize,
-  // //   irradianceCubeTexSize,
-  // // )
+  // gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer)
+  gl.renderbufferStorage(
+    gl.RENDERBUFFER,
+    gl.DEPTH_COMPONENT16,
+    irradianceCubeTexSize,
+    irradianceCubeTexSize,
+  )
 
-  // // gl.viewport(0, 0, irradianceCubeTexSize, irradianceCubeTexSize)
-  // // for (let i = 0; i < 6; i++) {
-  // //   gl.framebufferTexture2D(
-  // //     gl.FRAMEBUFFER,
-  // //     gl.COLOR_ATTACHMENT0,
-  // //     gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
-  // //     irradianceTexture,
-  // //     0,
-  // //   )
-  // //   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-  // //   captureFaceCamera.lookAt = CUBEMAP_SIDES_CAPTURE_LOOK_ATS[i]
-  // //   captureFaceCamera.upVector = CUBEMAP_SIDES_CAPTURE_UP_VECTORS[i]
-  // //   captureFaceCamera.updateViewMatrix().updateProjectionViewMatrix()
-  // //   cubemapToIrradiance.render(captureFaceCamera)
-  // // }
+  gl.viewport(0, 0, irradianceCubeTexSize, irradianceCubeTexSize)
+  for (let i = 0; i < 6; i++) {
+    gl.framebufferTexture2D(
+      gl.FRAMEBUFFER,
+      gl.COLOR_ATTACHMENT0,
+      gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
+      irradianceTexture,
+      0,
+    )
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+    captureFaceCamera.lookAt = CUBEMAP_SIDES_CAPTURE_LOOK_ATS[i]
+    captureFaceCamera.upVector = CUBEMAP_SIDES_CAPTURE_UP_VECTORS[i]
+    captureFaceCamera.updateViewMatrix().updateProjectionViewMatrix()
+    cubemapToIrradiance.render(captureFaceCamera)
+  }
 
-  // // // pre-filtering an environment map is quite similar to how we convoluted an irradiance map
-  // // // the difference being that we now account for roughness and store sequentially rougher
-  // // // reflections in the pre-filtered map's mip levels.
-  // // const prefilteredEnvironmentTexture = gl.createTexture()
-  // // const prefilteredEnvironmentTexSize = 128
-  // // gl.bindTexture(gl.TEXTURE_CUBE_MAP, prefilteredEnvironmentTexture)
-  // // for (let i = 0; i < 6; i++) {
-  // //   gl.texImage2D(
-  // //     gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
-  // //     0,
-  // //     gl.RGBA16F,
-  // //     prefilteredEnvironmentTexSize,
-  // //     prefilteredEnvironmentTexSize,
-  // //     0,
-  // //     gl.RGBA,
-  // //     gl.HALF_FLOAT,
-  // //     null,
-  // //   )
-  // // }
-  // // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-  // // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-  // // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_R, gl.CLAMP_TO_EDGE)
-  // // gl.texParameteri(
-  // //   gl.TEXTURE_CUBE_MAP,
-  // //   gl.TEXTURE_MIN_FILTER,
-  // //   gl.LINEAR_MIPMAP_LINEAR,
-  // // )
-  // // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-  // // // important - we need to generate mipmaps. Each mip level will store a blurrier prefiltered map
-  // // // for each material roughness level
-  // // gl.generateMipmap(gl.TEXTURE_CUBE_MAP)
+  // pre-filtering an environment map is quite similar to how we convoluted an irradiance map
+  // the difference being that we now account for roughness and store sequentially rougher
+  // reflections in the pre-filtered map's mip levels.
+  const prefilteredEnvironmentTexture = gl.createTexture()
+  const prefilteredEnvironmentTexSize = 128
+  gl.bindTexture(gl.TEXTURE_CUBE_MAP, prefilteredEnvironmentTexture)
+  for (let i = 0; i < 6; i++) {
+    gl.texImage2D(
+      gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
+      0,
+      gl.RGBA16F,
+      prefilteredEnvironmentTexSize,
+      prefilteredEnvironmentTexSize,
+      0,
+      gl.RGBA,
+      gl.HALF_FLOAT,
+      null,
+    )
+  }
+  gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+  gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+  gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_R, gl.CLAMP_TO_EDGE)
+  gl.texParameteri(
+    gl.TEXTURE_CUBE_MAP,
+    gl.TEXTURE_MIN_FILTER,
+    gl.LINEAR_MIPMAP_LINEAR,
+  )
+  gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+  // important - we need to generate mipmaps. Each mip level will store a blurrier prefiltered map
+  // for each material roughness level
+  gl.generateMipmap(gl.TEXTURE_CUBE_MAP)
 
-  // // cubemapToPrefilterEnvironment.envTexture = cubemapTexture
-  // // // we will render to each mip level of the prefilteredEnvironmentTexture
-  // // // with varying rougness
-  // // // roughness: 0.0  = mip level 0
-  // // // roughness: 0.25 = mip level 1
-  // // // roughness: 0.5  = mip level 2
-  // // // roughness: 0.75 = mip level 3
-  // // // roughness: 1.0  = mip level 4
-  // // const maxMipLevels = 5
-  // // for (let mip = 0; mip < maxMipLevels; mip++) {
-  // //   const mipWidth = prefilteredEnvironmentTexSize * Math.pow(0.5, mip)
-  // //   const mipHeight = prefilteredEnvironmentTexSize * Math.pow(0.5, mip)
-  // //   // gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer)
-  // //   gl.renderbufferStorage(
-  // //     gl.RENDERBUFFER,
-  // //     gl.DEPTH_COMPONENT16,
-  // //     mipWidth,
-  // //     mipHeight,
-  // //   )
+  cubemapToPrefilterEnvironment.envTexture = cubemapTexture
+  // we will render to each mip level of the prefilteredEnvironmentTexture
+  // with varying rougness
+  // roughness: 0.0  = mip level 0
+  // roughness: 0.25 = mip level 1
+  // roughness: 0.5  = mip level 2
+  // roughness: 0.75 = mip level 3
+  // roughness: 1.0  = mip level 4
+  const maxMipLevels = 5
+  for (let mip = 0; mip < maxMipLevels; mip++) {
+    const mipWidth = prefilteredEnvironmentTexSize * Math.pow(0.5, mip)
+    const mipHeight = prefilteredEnvironmentTexSize * Math.pow(0.5, mip)
+    // gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer)
+    gl.renderbufferStorage(
+      gl.RENDERBUFFER,
+      gl.DEPTH_COMPONENT16,
+      mipWidth,
+      mipHeight,
+    )
 
-  // //   gl.viewport(0, 0, mipWidth, mipHeight)
+    gl.viewport(0, 0, mipWidth, mipHeight)
 
-  // //   const roughness = mip / (maxMipLevels - 1)
-  // //   cubemapToPrefilterEnvironment.updateUniform('u_roughness', roughness)
+    const roughness = mip / (maxMipLevels - 1)
+    cubemapToPrefilterEnvironment.updateUniform('u_roughness', roughness)
 
-  // //   for (let i = 0; i < 6; i++) {
-  // //     captureFaceCamera.lookAt = CUBEMAP_SIDES_CAPTURE_LOOK_ATS[i]
-  // //     captureFaceCamera.upVector = CUBEMAP_SIDES_CAPTURE_UP_VECTORS[i]
-  // //     captureFaceCamera.updateViewMatrix().updateProjectionViewMatrix()
+    for (let i = 0; i < 6; i++) {
+      captureFaceCamera.lookAt = CUBEMAP_SIDES_CAPTURE_LOOK_ATS[i]
+      captureFaceCamera.upVector = CUBEMAP_SIDES_CAPTURE_UP_VECTORS[i]
+      captureFaceCamera.updateViewMatrix().updateProjectionViewMatrix()
 
-  // //     gl.framebufferTexture2D(
-  // //       gl.FRAMEBUFFER,
-  // //       gl.COLOR_ATTACHMENT0,
-  // //       gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
-  // //       prefilteredEnvironmentTexture,
-  // //       mip,
-  // //     )
+      gl.framebufferTexture2D(
+        gl.FRAMEBUFFER,
+        gl.COLOR_ATTACHMENT0,
+        gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
+        prefilteredEnvironmentTexture,
+        mip,
+      )
 
-  // //     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-  // //     cubemapToPrefilterEnvironment.render(captureFaceCamera)
-  // //   }
-  // // }
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+      cubemapToPrefilterEnvironment.render(captureFaceCamera)
+    }
+  }
 
   // create the BRDF convolution into a 2d 512x512 texture
   // note that we use a 16-bit precision floating format as recommended by Epic Games
@@ -1107,8 +1111,8 @@ function convoluteHDREnvironment([width, height, imageData]) {
 
   for (const sphere of spheres) {
     // gl.deleteTexture(sphere.irradianceTexture)
-    // sphere.irradianceMapTexture = irradianceTexture
-    // sphere.prefilterMapTexture = prefilteredEnvironmentTexture
+    sphere.irradianceMapTexture = irradianceTexture
+    sphere.prefilterMapTexture = prefilteredEnvironmentTexture
     sphere.brdfLutTexture = brdfLutTexture
   }
 
