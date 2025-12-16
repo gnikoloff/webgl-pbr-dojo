@@ -1261,5 +1261,5 @@ function loadHDRImage(src) {
 }
 
 function transformAssetSrc(src) {
-  return window.BASE_URL ? `${window.BASE_URL}/assets/${src}` : src
+  return src
 }
