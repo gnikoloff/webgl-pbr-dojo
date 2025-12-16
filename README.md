@@ -1,7 +1,7 @@
 # WebGL Physically Based Rendering Playground
 
-![Screenshot from the renderer showcasing a specific set of lighting parameters](webgl-pbr-export-0.png)
 ![Screenshot from the renderer showcasing a different set of lighting parameters](webgl-pbr-export-1.png)
+![Screenshot from the renderer showcasing a specific set of lighting parameters](webgl-pbr-export-0.png)
 
 WebGL 2.0 physically-based renderer featuring IBL with environment map convolution, HDR tone mapping, analytical lights, and the metallic-roughness PBR workflow. Implementation based on LearnOpenGL's PBR theory.
 
@@ -16,9 +16,9 @@ npm run dev
 
 ## Dependencies
 
-- [`Minimal WebGL2 library`](https://github.com/gnikoloff/hwoa-rang-gl2)
-- [`Tweening utils`](https://github.com/gnikoloff/hwoa-rang-tween)
-- [`3d math helpers`](https://github.com/gnikoloff/hwoa-rang-math)
+- [Minimal WebGL2 library](https://github.com/gnikoloff/hwoa-rang-gl2)
+- [Tweening utils](https://github.com/gnikoloff/hwoa-rang-tween)
+- [3d math helpers](https://github.com/gnikoloff/hwoa-rang-math)
 - [KTX 2.0 (.ktx2) parser and serializer](https://github.com/donmccurdy/KTX-Parse)
 - [Tweakpane](https://tweakpane.github.io/docs/)
 
@@ -26,6 +26,7 @@ npm run dev
 
 - [The PBR chapter in LearnOpenGL](https://learnopengl.com/PBR/Theory)
 - [Real Shading in Unreal Engine 4](https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf)
+- [WebGL2 UBO Tutorial](https://gist.github.com/jialiang/2880d4cc3364df117320e8cb324c2880)
 
 ## License
 
