@@ -12,7 +12,6 @@ import {
   createPlane,
   createSphere,
   createUniformBlockInfo,
-  OrthographicCamera,
   PerspectiveCamera,
   SceneNode,
 } from '../lib/hwoa-rang-gl2'
@@ -415,21 +414,10 @@ pane
 // const toHalfWorker = new ToHalfFloatWebWorker()
 
 const canvas = document.createElement('canvas')
+canvas.setAttribute('id', 'c')
 document.body.appendChild(canvas)
 
 const gl = canvas.getContext('webgl2')
-
-const orthoCamera = new OrthographicCamera(
-  -innerWidth / 2,
-  innerWidth / 2,
-  innerHeight / 2,
-  -innerHeight / 2,
-  0,
-  2,
-)
-orthoCamera.position = [0, 0, 1]
-orthoCamera.lookAt = [0, 0, 0]
-orthoCamera.updateProjectionViewMatrix()
 
 const perspCamera = new PerspectiveCamera(
   (45 * Math.PI) / 180,
@@ -772,16 +760,18 @@ function drawFrame(ts) {
   }
 
   if (convolutionState) {
-    // Process one step per frame
-    if (convolutionState.step === 0) {
+    const stepMS = 75
+    if (convolutionState.step === stepMS * 0) {
+      canvas.classList.remove('visible')
       convoluteCubemap(convolutionState)
-    } else if (convolutionState.step === 10) {
+    } else if (convolutionState.step === stepMS * 1) {
       convolveIrradiance()
-    } else if (convolutionState.step === 20) {
+    } else if (convolutionState.step === stepMS * 2) {
       convolvePrefilter()
-    } else if (convolutionState.step === 30) {
+    } else if (convolutionState.step === stepMS * 3) {
       convolveBRDF()
       convolutionState = null // Done
+      canvas.classList.add('visible')
       return
     }
     convolutionState.step++
@@ -1234,8 +1224,6 @@ function onResize() {
   perspCamera.updateProjectionMatrix()
   canvas.width = innerWidth * devicePixelRatio
   canvas.height = innerHeight * devicePixelRatio
-  canvas.style.setProperty('width', `${innerWidth}px`)
-  canvas.style.setProperty('height', `${innerHeight}px`)
 }
 
 function hideNoneOptionFromTweakpane() {
