@@ -429,7 +429,7 @@ perspCamera.position = [10.84, -0.17, 8.98]
 perspCamera.lookAt = [0, 0, 0]
 perspCamera.updateProjectionMatrix()
 
-new CameraController(perspCamera, canvas, false, isTouchDevice() ? 2 : 0.85)
+new CameraController(perspCamera, canvas, false, isTouchDevice() ? 2 : 1.2)
 
 // used for capturing each cube face when converting equirectangular to cubemap
 const captureFaceCamera = new PerspectiveCamera(
