@@ -1,4 +1,5 @@
-var In=Object.defineProperty;var cn=Object.getOwnPropertySymbols;var Nn=Object.prototype.hasOwnProperty,Cn=Object.prototype.propertyIsEnumerable;var Q=(o,t,e)=>t in o?In(o,t,{enumerable:!0,configurable:!0,writable:!0,value:e}):o[t]=e,U=(o,t)=>{for(var e in t||(t={}))Nn.call(t,e)&&Q(o,e,t[e]);if(cn)for(var e of cn(t))Cn.call(t,e)&&Q(o,e,t[e]);return o};var w=(o,t,e)=>(Q(o,typeof t!="symbol"?t+"":t,e),e),fn=(o,t,e)=>{if(!t.has(o))throw TypeError("Cannot "+e)};var l=(o,t,e)=>(fn(o,t,"read from private field"),e?e.call(o):t.get(o)),u=(o,t,e)=>{if(t.has(o))throw TypeError("Cannot add the same private member more than once");t instanceof WeakSet?t.add(o):t.set(o,e)},m=(o,t,e,a)=>(fn(o,t,"write to private field"),a?a.call(o,e):t.set(o,e),e);import{t as On,T as Dn}from"./assets/vendor.adb55ed6.js";import{s as yn,a as Xn,H as dn,h as hn,b as Vn,c as Hn,d as Gn}from"./assets/Tokyo_BigSight_thumb.4a2a6e4e.js";import{D as W,O as kn,P as En,C as Wn,c as zn,a as jn,e as Yn,S as Kn,b as z,d as j,L as qn}from"./assets/light-debug.4730310f.js";var B,L,I,N;class $n extends W{constructor(t,e,a,i,s){super(t,a,i,U({PI:Math.PI,USE_NORMAL:!0,USE_WORLD_POS:!0,USE_PBR:!0},s),"sphere");u(this,B,void 0);u(this,L,void 0);u(this,I,void 0);u(this,N,void 0);w(this,"irradianceMapTexture");w(this,"envMapTexture");const{vertexCount:c,vertexStride:f,interleavedArray:r,indicesArray:p}=e;this.vertexCount=c;const h=t.getAttribLocation(this.program,"aPosition"),x=t.getAttribLocation(this.program,"aNormal"),T=t.createBuffer(),q=t.createBuffer();this.gl.bindVertexArray(this.vao),t.bindBuffer(t.ARRAY_BUFFER,T),t.bufferData(t.ARRAY_BUFFER,r,t.STATIC_DRAW),t.enableVertexAttribArray(h),t.vertexAttribPointer(h,3,t.FLOAT,!1,f*Float32Array.BYTES_PER_ELEMENT,0*Float32Array.BYTES_PER_ELEMENT),t.enableVertexAttribArray(x),t.vertexAttribPointer(x,3,t.FLOAT,!1,f*Float32Array.BYTES_PER_ELEMENT,3*Float32Array.BYTES_PER_ELEMENT),t.bindBuffer(t.ELEMENT_ARRAY_BUFFER,q),t.bufferData(t.ELEMENT_ARRAY_BUFFER,p,t.STATIC_DRAW),this.gl.bindVertexArray(null),this.updateUniform("u_worldMatrix",this.worldMatrix),this.setUniform("u_albedo",{type:t.FLOAT_VEC3,value:new Float32Array([1,0,0])}),this.setUniform("u_irradianceMap",{type:t.INT,value:0}),m(this,B,t.getUniformBlockIndex(this.program,"Projection")),m(this,L,t.getUniformBlockIndex(this.program,"View")),m(this,I,t.getUniformBlockIndex(this.program,"Lighting")),m(this,N,t.getUniformBlockIndex(this.program,"PostFX"))}render(){!this.visible||(this.gl.uniformBlockBinding(this.program,l(this,B),0),this.gl.uniformBlockBinding(this.program,l(this,L),1),this.gl.uniformBlockBinding(this.program,l(this,I),2),this.gl.uniformBlockBinding(this.program,l(this,N),3),this.gl.useProgram(this.program),this.irradianceMapTexture&&(this.gl.activeTexture(this.gl.TEXTURE0),this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP,this.irradianceMapTexture)),this.envMapTexture&&(this.gl.activeTexture(this.gl.TEXTURE1),this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP,this.envMapTexture)),this.gl.bindVertexArray(this.vao),this.gl.drawElements(this.gl.TRIANGLES,this.vertexCount,this.gl.UNSIGNED_SHORT,0),this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP,null),this.gl.bindVertexArray(null))}}B=new WeakMap,L=new WeakMap,I=new WeakMap,N=new WeakMap;var A,C,O;const ln=class extends W{constructor(t,e,a,i,s,c){super(t,i,s,U({PI:Math.PI,USE_UV:!0},c));u(this,A,void 0);u(this,C,void 0);u(this,O,void 0);const{vertexCount:f,vertexStride:r,interleavedArray:p,indicesArray:h}=a;this.vertexCount=f;const x=t.getAttribLocation(this.program,"aPosition"),T=t.getAttribLocation(this.program,"aUv"),q=t.createBuffer(),Ln=t.createBuffer();this.gl.bindVertexArray(this.vao),t.bindBuffer(t.ARRAY_BUFFER,q),t.bufferData(t.ARRAY_BUFFER,p,t.STATIC_DRAW),t.enableVertexAttribArray(x),t.vertexAttribPointer(x,3,t.FLOAT,!1,r*Float32Array.BYTES_PER_ELEMENT,0*Float32Array.BYTES_PER_ELEMENT),t.enableVertexAttribArray(T),t.vertexAttribPointer(T,2,t.FLOAT,!1,r*Float32Array.BYTES_PER_ELEMENT,3*Float32Array.BYTES_PER_ELEMENT),t.bindBuffer(t.ELEMENT_ARRAY_BUFFER,Ln),t.bufferData(t.ELEMENT_ARRAY_BUFFER,h,t.STATIC_DRAW),this.gl.bindVertexArray(null),this.updateUniform("u_worldMatrix",this.worldMatrix),this.setUniform("u_diffuse",{type:t.INT,value:0});const $=ln.createTextCanvas(e);m(this,A,t.createTexture()),t.bindTexture(t.TEXTURE_2D,l(this,A)),t.texImage2D(t.TEXTURE_2D,0,t.RGBA,$.width,$.height,0,t.RGBA,t.UNSIGNED_BYTE,$),t.generateMipmap(t.TEXTURE_2D),t.bindTexture(t.TEXTURE_2D,null),m(this,C,t.getUniformBlockIndex(this.program,"Projection")),m(this,O,t.getUniformBlockIndex(this.program,"View"))}static createTextCanvas(t){const e=document.createElement("canvas"),a=e.getContext("2d");e.width=1024,e.height=128;const i=20,s=10,c=100;a.font=`${c}px Helvetica`,a.fillStyle="#fff",a.textBaseline="middle",a.fillText(t,i,e.height/2);const{width:f}=a.measureText(t),r=i+f+40;return a.strokeStyle="#fff",a.lineWidth=5,a.beginPath(),a.moveTo(r,e.height/2),a.lineTo(e.width-s,e.height/2),a.stroke(),a.beginPath(),a.moveTo(e.width-s,e.height/2),a.lineTo(e.width-s-40,e.height/2+30),a.stroke(),a.beginPath(),a.moveTo(e.width-s,e.height/2),a.lineTo(e.width-s-40,e.height/2-30),a.stroke(),e}render(){this.gl.uniformBlockBinding(this.program,l(this,C),0),this.gl.uniformBlockBinding(this.program,l(this,O),1),this.gl.useProgram(this.program),this.gl.bindVertexArray(this.vao),this.gl.activeTexture(this.gl.TEXTURE0),this.gl.bindTexture(this.gl.TEXTURE_2D,l(this,A)),this.gl.drawElements(this.gl.TRIANGLES,this.vertexCount,this.gl.UNSIGNED_SHORT,0),this.gl.bindTexture(this.gl.TEXTURE_2D,null),this.gl.bindVertexArray(null)}};let an=ln;A=new WeakMap,C=new WeakMap,O=new WeakMap;class pn extends W{constructor(t,e,a,i,s={}){super(t,a,i,U({PI:Math.PI,USE_UNIQUE_PROJECTION_VIEW_MATRIX:!0},s));w(this,"texture");w(this,"envTexture");const{vertexCount:c,vertexStride:f,interleavedArray:r,indicesArray:p}=e;this.vertexCount=c;const h=t.getAttribLocation(this.program,"aPosition"),x=t.createBuffer(),T=t.createBuffer();this.gl.bindVertexArray(this.vao),t.bindBuffer(t.ARRAY_BUFFER,x),t.bufferData(t.ARRAY_BUFFER,r,t.STATIC_DRAW),t.enableVertexAttribArray(h),t.vertexAttribPointer(h,3,t.FLOAT,!1,f*Float32Array.BYTES_PER_ELEMENT,0*Float32Array.BYTES_PER_ELEMENT),t.bindBuffer(t.ELEMENT_ARRAY_BUFFER,T),t.bufferData(t.ELEMENT_ARRAY_BUFFER,p,t.STATIC_DRAW),this.gl.bindVertexArray(null),this.updateUniform("u_worldMatrix",this.worldMatrix),this.setUniform("u_projectionViewMatrix",{type:t.FLOAT_MAT4})}render(t){this.gl.useProgram(this.program),this.updateUniform("u_projectionViewMatrix",t.projectionViewMatrix),this.gl.bindVertexArray(this.vao),this.texture&&(this.gl.activeTexture(this.gl.TEXTURE0),this.gl.bindTexture(this.gl.TEXTURE_2D,this.texture)),this.envTexture&&(this.gl.activeTexture(this.gl.TEXTURE0),this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP,this.envTexture)),this.gl.drawElements(this.gl.TRIANGLES,this.vertexCount,this.gl.UNSIGNED_SHORT,0),this.gl.bindTexture(this.gl.TEXTURE_2D,null),this.gl.bindVertexArray(null)}}var D,y,X,E;class Qn extends W{constructor(t,e,a,i,s={}){super(t,a,i,U({PI:Math.PI,IS_CUBEMAP:!0},s));u(this,D,void 0);u(this,y,void 0);u(this,X,void 0);u(this,E,void 0);const{vertexCount:c,vertexStride:f,interleavedArray:r,indicesArray:p}=e;this.vertexCount=c;const h=t.getAttribLocation(this.program,"aPosition"),x=t.createBuffer(),T=t.createBuffer();this.gl.bindVertexArray(this.vao),t.bindBuffer(t.ARRAY_BUFFER,x),t.bufferData(t.ARRAY_BUFFER,r,t.STATIC_DRAW),t.enableVertexAttribArray(h),t.vertexAttribPointer(h,3,t.FLOAT,!1,f*Float32Array.BYTES_PER_ELEMENT,0*Float32Array.BYTES_PER_ELEMENT),t.bindBuffer(t.ELEMENT_ARRAY_BUFFER,T),t.bufferData(t.ELEMENT_ARRAY_BUFFER,p,t.STATIC_DRAW),this.gl.bindVertexArray(null),this.updateUniform("u_worldMatrix",this.worldMatrix),this.setUniform("u_environmentMap",{type:t.INT,value:0}),m(this,D,t.getUniformBlockIndex(this.program,"Projection")),m(this,y,t.getUniformBlockIndex(this.program,"View")),m(this,X,t.getUniformBlockIndex(this.program,"PostFX"))}get texture(){return l(this,E)}set texture(t){l(this,E)&&this.gl.deleteTexture(l(this,E)),m(this,E,t)}render(){this.gl.uniformBlockBinding(this.program,l(this,D),0),this.gl.uniformBlockBinding(this.program,l(this,y),1),this.gl.uniformBlockBinding(this.program,l(this,X),3),this.gl.useProgram(this.program),this.gl.bindVertexArray(this.vao),l(this,E)&&(this.gl.activeTexture(this.gl.TEXTURE0),this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP,l(this,E))),this.gl.drawElements(this.gl.TRIANGLES,this.vertexCount,this.gl.UNSIGNED_SHORT,0),l(this,E),this.gl.bindVertexArray(null)}}D=new WeakMap,y=new WeakMap,X=new WeakMap,E=new WeakMap;var M=`#version 300 es
+var In=Object.defineProperty;var cn=Object.getOwnPropertySymbols;var Nn=Object.prototype.hasOwnProperty,Cn=Object.prototype.propertyIsEnumerable;var Q=(o,t,e)=>t in o?In(o,t,{enumerable:!0,configurable:!0,writable:!0,value:e}):o[t]=e,U=(o,t)=>{for(var e in t||(t={}))Nn.call(t,e)&&Q(o,e,t[e]);if(cn)for(var e of cn(t))Cn.call(t,e)&&Q(o,e,t[e]);return o};var w=(o,t,e)=>(Q(o,typeof t!="symbol"?t+"":t,e),e),fn=(o,t,e)=>{if(!t.has(o))throw TypeError("Cannot "+e)};var l=(o,t,e)=>(fn(o,t,"read from private field"),e?e.call(o):t.get(o)),u=(o,t,e)=>{if(t.has(o))throw TypeError("Cannot add the same private member more than once");t instanceof WeakSet?t.add(o):t.set(o,e)},m=(o,t,e,a)=>(fn(o,t,"write to private field"),a?a.call(o,e):t.set(o,e),e);import{t as On,T as Dn}from"./assets/vendor.6bba9758.js";import{s as yn,a as Xn,H as dn,h as hn,b as Vn,c as Hn,d as Gn}from"./assets/qwantani_moon_noon_puresky_1k.f9b864b5.js";import{D as W,O as kn,P as En,C as Wn,c as zn,a as jn,e as Yn,S as Kn,b as z,d as j,L as qn}from"./assets/light-debug.d2e766b9.js";class pn extends W{constructor(t,e,a,i,s={}){super(t,a,i,U({PI:Math.PI,USE_UNIQUE_PROJECTION_VIEW_MATRIX:!0},s));w(this,"texture");w(this,"envTexture");const{vertexCount:c,vertexStride:f,interleavedArray:r,indicesArray:p}=e;this.vertexCount=c;const h=t.getAttribLocation(this.program,"aPosition"),x=t.createBuffer(),T=t.createBuffer();this.gl.bindVertexArray(this.vao),t.bindBuffer(t.ARRAY_BUFFER,x),t.bufferData(t.ARRAY_BUFFER,r,t.STATIC_DRAW),t.enableVertexAttribArray(h),t.vertexAttribPointer(h,3,t.FLOAT,!1,f*Float32Array.BYTES_PER_ELEMENT,0*Float32Array.BYTES_PER_ELEMENT),t.bindBuffer(t.ELEMENT_ARRAY_BUFFER,T),t.bufferData(t.ELEMENT_ARRAY_BUFFER,p,t.STATIC_DRAW),this.gl.bindVertexArray(null),this.updateUniform("u_worldMatrix",this.worldMatrix),this.setUniform("u_projectionViewMatrix",{type:t.FLOAT_MAT4})}render(t){this.gl.useProgram(this.program),this.updateUniform("u_projectionViewMatrix",t.projectionViewMatrix),this.gl.bindVertexArray(this.vao),this.texture&&(this.gl.activeTexture(this.gl.TEXTURE0),this.gl.bindTexture(this.gl.TEXTURE_2D,this.texture)),this.envTexture&&(this.gl.activeTexture(this.gl.TEXTURE0),this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP,this.envTexture)),this.gl.drawElements(this.gl.TRIANGLES,this.vertexCount,this.gl.UNSIGNED_SHORT,0),this.gl.bindTexture(this.gl.TEXTURE_2D,null),this.gl.bindVertexArray(null)}}var A,B,L;const ln=class extends W{constructor(t,e,a,i,s,c){super(t,i,s,U({PI:Math.PI,USE_UV:!0},c));u(this,A,void 0);u(this,B,void 0);u(this,L,void 0);const{vertexCount:f,vertexStride:r,interleavedArray:p,indicesArray:h}=a;this.vertexCount=f;const x=t.getAttribLocation(this.program,"aPosition"),T=t.getAttribLocation(this.program,"aUv"),q=t.createBuffer(),Ln=t.createBuffer();this.gl.bindVertexArray(this.vao),t.bindBuffer(t.ARRAY_BUFFER,q),t.bufferData(t.ARRAY_BUFFER,p,t.STATIC_DRAW),t.enableVertexAttribArray(x),t.vertexAttribPointer(x,3,t.FLOAT,!1,r*Float32Array.BYTES_PER_ELEMENT,0*Float32Array.BYTES_PER_ELEMENT),t.enableVertexAttribArray(T),t.vertexAttribPointer(T,2,t.FLOAT,!1,r*Float32Array.BYTES_PER_ELEMENT,3*Float32Array.BYTES_PER_ELEMENT),t.bindBuffer(t.ELEMENT_ARRAY_BUFFER,Ln),t.bufferData(t.ELEMENT_ARRAY_BUFFER,h,t.STATIC_DRAW),this.gl.bindVertexArray(null),this.updateUniform("u_worldMatrix",this.worldMatrix),this.setUniform("u_diffuse",{type:t.INT,value:0});const $=ln.createTextCanvas(e);m(this,A,t.createTexture()),t.bindTexture(t.TEXTURE_2D,l(this,A)),t.texImage2D(t.TEXTURE_2D,0,t.RGBA,$.width,$.height,0,t.RGBA,t.UNSIGNED_BYTE,$),t.generateMipmap(t.TEXTURE_2D),t.bindTexture(t.TEXTURE_2D,null),m(this,B,t.getUniformBlockIndex(this.program,"Projection")),m(this,L,t.getUniformBlockIndex(this.program,"View"))}static createTextCanvas(t){const e=document.createElement("canvas"),a=e.getContext("2d");e.width=1024,e.height=128;const i=20,s=10,c=100;a.font=`${c}px Helvetica`,a.fillStyle="#fff",a.textBaseline="middle",a.fillText(t,i,e.height/2);const{width:f}=a.measureText(t),r=i+f+40;return a.strokeStyle="#fff",a.lineWidth=5,a.beginPath(),a.moveTo(r,e.height/2),a.lineTo(e.width-s,e.height/2),a.stroke(),a.beginPath(),a.moveTo(e.width-s,e.height/2),a.lineTo(e.width-s-40,e.height/2+30),a.stroke(),a.beginPath(),a.moveTo(e.width-s,e.height/2),a.lineTo(e.width-s-40,e.height/2-30),a.stroke(),e}render(){this.gl.uniformBlockBinding(this.program,l(this,B),0),this.gl.uniformBlockBinding(this.program,l(this,L),1),this.gl.useProgram(this.program),this.gl.bindVertexArray(this.vao),this.gl.activeTexture(this.gl.TEXTURE0),this.gl.bindTexture(this.gl.TEXTURE_2D,l(this,A)),this.gl.drawElements(this.gl.TRIANGLES,this.vertexCount,this.gl.UNSIGNED_SHORT,0),this.gl.bindTexture(this.gl.TEXTURE_2D,null),this.gl.bindVertexArray(null)}};let an=ln;A=new WeakMap,B=new WeakMap,L=new WeakMap;var I,N,C,E;class $n extends W{constructor(t,e,a,i,s={}){super(t,a,i,U({PI:Math.PI,IS_CUBEMAP:!0},s));u(this,I,void 0);u(this,N,void 0);u(this,C,void 0);u(this,E,void 0);const{vertexCount:c,vertexStride:f,interleavedArray:r,indicesArray:p}=e;this.vertexCount=c;const h=t.getAttribLocation(this.program,"aPosition"),x=t.createBuffer(),T=t.createBuffer();this.gl.bindVertexArray(this.vao),t.bindBuffer(t.ARRAY_BUFFER,x),t.bufferData(t.ARRAY_BUFFER,r,t.STATIC_DRAW),t.enableVertexAttribArray(h),t.vertexAttribPointer(h,3,t.FLOAT,!1,f*Float32Array.BYTES_PER_ELEMENT,0*Float32Array.BYTES_PER_ELEMENT),t.bindBuffer(t.ELEMENT_ARRAY_BUFFER,T),t.bufferData(t.ELEMENT_ARRAY_BUFFER,p,t.STATIC_DRAW),this.gl.bindVertexArray(null),this.updateUniform("u_worldMatrix",this.worldMatrix),this.setUniform("u_environmentMap",{type:t.INT,value:0}),m(this,I,t.getUniformBlockIndex(this.program,"Projection")),m(this,N,t.getUniformBlockIndex(this.program,"View")),m(this,C,t.getUniformBlockIndex(this.program,"PostFX"))}get texture(){return l(this,E)}set texture(t){l(this,E)&&this.gl.deleteTexture(l(this,E)),m(this,E,t)}render(){this.gl.uniformBlockBinding(this.program,l(this,I),0),this.gl.uniformBlockBinding(this.program,l(this,N),1),this.gl.uniformBlockBinding(this.program,l(this,C),3),this.gl.useProgram(this.program),this.gl.bindVertexArray(this.vao),l(this,E)&&(this.gl.activeTexture(this.gl.TEXTURE0),this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP,l(this,E))),this.gl.drawElements(this.gl.TRIANGLES,this.vertexCount,this.gl.UNSIGNED_SHORT,0),l(this,E),this.gl.bindVertexArray(null)}}I=new WeakMap,N=new WeakMap,C=new WeakMap,E=new WeakMap;var O,D,y,X;class Qn extends W{constructor(t,e,a,i,s){super(t,a,i,U({PI:Math.PI,USE_NORMAL:!0,USE_WORLD_POS:!0,USE_PBR:!0},s),"sphere");u(this,O,void 0);u(this,D,void 0);u(this,y,void 0);u(this,X,void 0);w(this,"irradianceMapTexture");w(this,"envMapTexture");const{vertexCount:c,vertexStride:f,interleavedArray:r,indicesArray:p}=e;this.vertexCount=c;const h=t.getAttribLocation(this.program,"aPosition"),x=t.getAttribLocation(this.program,"aNormal"),T=t.createBuffer(),q=t.createBuffer();this.gl.bindVertexArray(this.vao),t.bindBuffer(t.ARRAY_BUFFER,T),t.bufferData(t.ARRAY_BUFFER,r,t.STATIC_DRAW),t.enableVertexAttribArray(h),t.vertexAttribPointer(h,3,t.FLOAT,!1,f*Float32Array.BYTES_PER_ELEMENT,0*Float32Array.BYTES_PER_ELEMENT),t.enableVertexAttribArray(x),t.vertexAttribPointer(x,3,t.FLOAT,!1,f*Float32Array.BYTES_PER_ELEMENT,3*Float32Array.BYTES_PER_ELEMENT),t.bindBuffer(t.ELEMENT_ARRAY_BUFFER,q),t.bufferData(t.ELEMENT_ARRAY_BUFFER,p,t.STATIC_DRAW),this.gl.bindVertexArray(null),this.updateUniform("u_worldMatrix",this.worldMatrix),this.setUniform("u_albedo",{type:t.FLOAT_VEC3,value:new Float32Array([1,0,0])}),this.setUniform("u_irradianceMap",{type:t.INT,value:0}),m(this,O,t.getUniformBlockIndex(this.program,"Projection")),m(this,D,t.getUniformBlockIndex(this.program,"View")),m(this,y,t.getUniformBlockIndex(this.program,"Lighting")),m(this,X,t.getUniformBlockIndex(this.program,"PostFX"))}render(){!this.visible||(this.gl.uniformBlockBinding(this.program,l(this,O),0),this.gl.uniformBlockBinding(this.program,l(this,D),1),this.gl.uniformBlockBinding(this.program,l(this,y),2),this.gl.uniformBlockBinding(this.program,l(this,X),3),this.gl.useProgram(this.program),this.irradianceMapTexture&&(this.gl.activeTexture(this.gl.TEXTURE0),this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP,this.irradianceMapTexture)),this.envMapTexture&&(this.gl.activeTexture(this.gl.TEXTURE1),this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP,this.envMapTexture)),this.gl.bindVertexArray(this.vao),this.gl.drawElements(this.gl.TRIANGLES,this.vertexCount,this.gl.UNSIGNED_SHORT,0),this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP,null),this.gl.bindVertexArray(null))}}O=new WeakMap,D=new WeakMap,y=new WeakMap,X=new WeakMap;var Jn=`#version 300 es
+precision highp float;
 
 -- DEFINES_HOOK --
 
@@ -27,56 +28,121 @@ uniform PostFX {
   };
 #endif
 
-uniform mat4 u_projectionViewMatrix;
-uniform mat4 u_worldMatrix;
+uniform samplerCube u_environmentMap;
 
-in vec4 aPosition;
-out vec3 vLocalPos;
+in vec3 vLocalPos;
 
-#ifdef USE_UV
-  in vec2 aUv;
-  out vec2 vUv;
-#endif
-
-#ifdef USE_NORMAL
-  in vec3 aNormal;
-  out vec3 vNormal;
-#endif
-
-#ifdef USE_WORLD_POS
-  out vec3 vWorldPos;
-#endif
+out vec4 finalColor;
 
 void main () {
-  vec4 worldPos = u_worldMatrix * aPosition;
+  vec3 normal = normalize(vLocalPos);
+  vec3 irradiance = vec3(0.0);
+  vec3 up = vec3(0.0, 1.0, 0.0);
+  vec3 right = normalize(cross(up, normal));
+  up = normalize(cross(normal, right));
 
-  #ifdef IS_CUBEMAP
-    
-    mat4 rotView = mat4(mat3(viewMatrix));
-    vec4 clipPos = projMatrix * rotView * worldPos;
-    gl_Position = clipPos.xyww;
-  #else
-    #ifdef USE_UNIQUE_PROJECTION_VIEW_MATRIX
-      gl_Position = u_projectionViewMatrix * worldPos;
-    #else
-      gl_Position = projMatrix * viewMatrix * worldPos;
-    #endif
-  #endif
-  
-  #ifdef USE_NORMAL
-    vNormal = mat3(u_worldMatrix) * aNormal;
-  #endif
+  float sampleDelta = 0.02;
+  float nrSamples = 0.0; 
+  for (float phi = 0.0; phi < 2.0 * PI; phi += sampleDelta) {
+    for (float theta = 0.0; theta < 0.5 * PI; theta += sampleDelta) {
+      
+      vec3 tangentSample = vec3(sin(theta) * cos(phi),  sin(theta) * sin(phi), cos(theta));
 
-  #ifdef USE_UV
-    vUv = aUv;
-  #endif
+      
+      vec3 sampleVec = tangentSample.x * right + tangentSample.y * up + tangentSample.z * normal; 
 
-  #ifdef USE_WORLD_POS
-    vWorldPos = worldPos.xyz;
-  #endif
-  
-  vLocalPos = aPosition.xyz;
-}`,Jn=`#version 300 es
+      irradiance += texture(u_environmentMap, sampleVec).rgb * cos(theta) * sin(theta);
+      nrSamples++;
+    }
+  }
+  finalColor = vec4(PI * irradiance * (1.0 / float(nrSamples)), 1.0);
+}`,Zn=`#version 300 es
+precision highp float;
+
+-- DEFINES_HOOK --
+
+uniform Projection {
+  mat4 projMatrix;
+  float zNear;
+  float zFar;
+};
+
+uniform View {
+  mat4 viewMatrix;
+  vec3 cameraPosition;
+  float time;
+};
+
+uniform PostFX {
+  float tonemappingMode;
+};
+
+#ifdef USE_PBR
+  uniform Lighting {
+    vec3 pointLightPositions[POINT_LIGHTS_COUNT];
+    vec3 pointLightColors[POINT_LIGHTS_COUNT];
+    float pointLightIntensity;
+    float diffuseLightMixFactor;
+  };
+#endif
+const vec2 invAtan = vec2(0.1591, 0.3183);
+
+vec2 sampleSphericalMap(vec3 v) {
+  vec2 uv = vec2(atan(v.z, v.x), asin(v.y));
+  uv *= invAtan;
+  uv += 0.5;
+  return uv;
+}
+
+uniform sampler2D u_equirectangularMap;
+
+in vec3 vLocalPos;
+
+out vec4 finalColor;
+
+void main () {
+  vec2 uv = sampleSphericalMap(normalize(vLocalPos));
+  vec3 color = texture(u_equirectangularMap, uv).rgb;
+  finalColor = vec4(color, 1.0);
+}`,xn=`#version 300 es
+precision highp float;
+
+-- DEFINES_HOOK --
+
+uniform Projection {
+  mat4 projMatrix;
+  float zNear;
+  float zFar;
+};
+
+uniform View {
+  mat4 viewMatrix;
+  vec3 cameraPosition;
+  float time;
+};
+
+uniform PostFX {
+  float tonemappingMode;
+};
+
+#ifdef USE_PBR
+  uniform Lighting {
+    vec3 pointLightPositions[POINT_LIGHTS_COUNT];
+    vec3 pointLightColors[POINT_LIGHTS_COUNT];
+    float pointLightIntensity;
+    float diffuseLightMixFactor;
+  };
+#endif
+
+uniform sampler2D u_diffuse;
+
+in vec2 vUv;
+
+out vec4 finalColor;
+
+void main () {
+  finalColor = texture(u_diffuse, vUv);
+}`,nt=`#version 300 es
 precision highp float;
 
 -- DEFINES_HOOK --
@@ -333,55 +399,7 @@ void main () {
   envColor = applyTonemapping(envColor, tonemappingMode);
   envColor = pow(envColor, vec3(1.0 / 2.2));
   finalColor = vec4(envColor, 1.0);
-}`,Zn=`#version 300 es
-precision highp float;
-
--- DEFINES_HOOK --
-
-uniform Projection {
-  mat4 projMatrix;
-  float zNear;
-  float zFar;
-};
-
-uniform View {
-  mat4 viewMatrix;
-  vec3 cameraPosition;
-  float time;
-};
-
-uniform PostFX {
-  float tonemappingMode;
-};
-
-#ifdef USE_PBR
-  uniform Lighting {
-    vec3 pointLightPositions[POINT_LIGHTS_COUNT];
-    vec3 pointLightColors[POINT_LIGHTS_COUNT];
-    float pointLightIntensity;
-    float diffuseLightMixFactor;
-  };
-#endif
-const vec2 invAtan = vec2(0.1591, 0.3183);
-
-vec2 sampleSphericalMap(vec3 v) {
-  vec2 uv = vec2(atan(v.z, v.x), asin(v.y));
-  uv *= invAtan;
-  uv += 0.5;
-  return uv;
-}
-
-uniform sampler2D u_equirectangularMap;
-
-in vec3 vLocalPos;
-
-out vec4 finalColor;
-
-void main () {
-  vec2 uv = sampleSphericalMap(normalize(vLocalPos));
-  vec3 color = texture(u_equirectangularMap, uv).rgb;
-  finalColor = vec4(color, 1.0);
-}`,nt=`#version 300 es
+}`,tt=`#version 300 es
 precision highp float;
 
 -- DEFINES_HOOK --
@@ -752,8 +770,7 @@ void main () {
   color = pow(color, vec3(1.0 / 2.2));
 
   finalColor = vec4(color, 1.0);
-}`,xn=`#version 300 es
-precision highp float;
+}`,M=`#version 300 es
 
 -- DEFINES_HOOK --
 
@@ -782,73 +799,56 @@ uniform PostFX {
   };
 #endif
 
-uniform sampler2D u_diffuse;
+uniform mat4 u_projectionViewMatrix;
+uniform mat4 u_worldMatrix;
 
-in vec2 vUv;
+in vec4 aPosition;
+out vec3 vLocalPos;
 
-out vec4 finalColor;
-
-void main () {
-  finalColor = texture(u_diffuse, vUv);
-}`,tt=`#version 300 es
-precision highp float;
-
--- DEFINES_HOOK --
-
-uniform Projection {
-  mat4 projMatrix;
-  float zNear;
-  float zFar;
-};
-
-uniform View {
-  mat4 viewMatrix;
-  vec3 cameraPosition;
-  float time;
-};
-
-uniform PostFX {
-  float tonemappingMode;
-};
-
-#ifdef USE_PBR
-  uniform Lighting {
-    vec3 pointLightPositions[POINT_LIGHTS_COUNT];
-    vec3 pointLightColors[POINT_LIGHTS_COUNT];
-    float pointLightIntensity;
-    float diffuseLightMixFactor;
-  };
+#ifdef USE_UV
+  in vec2 aUv;
+  out vec2 vUv;
 #endif
 
-uniform samplerCube u_environmentMap;
+#ifdef USE_NORMAL
+  in vec3 aNormal;
+  out vec3 vNormal;
+#endif
 
-in vec3 vLocalPos;
-
-out vec4 finalColor;
+#ifdef USE_WORLD_POS
+  out vec3 vWorldPos;
+#endif
 
 void main () {
-  vec3 normal = normalize(vLocalPos);
-  vec3 irradiance = vec3(0.0);
-  vec3 up = vec3(0.0, 1.0, 0.0);
-  vec3 right = normalize(cross(up, normal));
-  up = normalize(cross(normal, right));
+  vec4 worldPos = u_worldMatrix * aPosition;
 
-  float sampleDelta = 0.02;
-  float nrSamples = 0.0; 
-  for (float phi = 0.0; phi < 2.0 * PI; phi += sampleDelta) {
-    for (float theta = 0.0; theta < 0.5 * PI; theta += sampleDelta) {
-      
-      vec3 tangentSample = vec3(sin(theta) * cos(phi),  sin(theta) * sin(phi), cos(theta));
+  #ifdef IS_CUBEMAP
+    
+    mat4 rotView = mat4(mat3(viewMatrix));
+    vec4 clipPos = projMatrix * rotView * worldPos;
+    gl_Position = clipPos.xyww;
+  #else
+    #ifdef USE_UNIQUE_PROJECTION_VIEW_MATRIX
+      gl_Position = u_projectionViewMatrix * worldPos;
+    #else
+      gl_Position = projMatrix * viewMatrix * worldPos;
+    #endif
+  #endif
+  
+  #ifdef USE_NORMAL
+    vNormal = mat3(u_worldMatrix) * aNormal;
+  #endif
 
-      
-      vec3 sampleVec = tangentSample.x * right + tangentSample.y * up + tangentSample.z * normal; 
+  #ifdef USE_UV
+    vUv = aUv;
+  #endif
 
-      irradiance += texture(u_environmentMap, sampleVec).rgb * cos(theta) * sin(theta);
-      nrSamples++;
-    }
-  }
-  finalColor = vec4(PI * irradiance * (1.0 / float(nrSamples)), 1.0);
-}`;const V=7,nn=7,Y=10,K=10,k=4,J=["aces","filmic","lottes","reinhard","reinhard2","uchimura","uncharted","unreal"],un=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]],mn=[[0,-1,0],[0,-1,0],[0,0,1],[0,0,-1],[0,-1,0],[0,-1,0]],et=new Map([["mon-valley",hn],["theatre",Vn],["tokyo",Hn]]),_n={useDiffuseLight:!0,image:"mon-valley"},Tn=new Float32Array([2]),vn=new Float32Array([40]),Rn=new Float32Array([1]),F=new On.exports.Pane;F.registerPlugin(Dn);ft();F.element.parentNode.style.setProperty("width","400px");F.addBlade({view:"list",label:"tone mapping mode",options:J.map(o=>({text:o,value:o})),value:J[2]}).on("change",({value:o})=>{Tn[0]=J.indexOf(o)});F.addBlade({view:"slider",label:"point light luminance",min:0,max:50,value:20}).on("change",({value:o})=>{vn[0]=o});F.addInput(_n,"useDiffuseLight",{label:"use environment diffuse light"}).on("change",({value:o})=>{Rn[0]=o?1:0});F.addInput(_n,"image",{label:"environment image",view:"thumbnail-list",options:[{text:"MonValley Lookout",value:"mon-valley",src:b(Gn)},{text:"Theatre Center",value:"theatre",src:b(yn)},{text:"Tokyo BigSight",value:"tokyo",src:b(Xn)}]}).on("change",({value:{value:o}})=>{const t=new dn;t.onload=()=>{bn(t)},t.src=b(et.get(o))});const R=document.createElement("canvas");document.body.appendChild(R);const n=R.getContext("webgl2"),rn=new kn(-innerWidth/2,innerWidth/2,innerHeight/2,-innerHeight/2,0,2);rn.position=[0,0,1];rn.lookAt=[0,0,0];rn.updateProjectionViewMatrix();const d=new En(45*Math.PI/180,innerWidth/innerHeight,.1,100);d.position=[5.43,.2,14.06];d.lookAt=[0,0,0];d.updateProjectionMatrix();new Wn(d,R,!1);const v=new En(90*Math.PI/180,1,.1,10).updateProjectionMatrix(),Z=zn({radius:.5,widthSegments:32,heightSegments:32}),g=jn({width:5,height:5/8}),sn=Yn({flipUVy:!0}),_=new Kn,ot={POINT_LIGHTS_COUNT:k.toString()},Pn=[],at=Y/V,rt=K/nn;for(let o=0;o<nn;o++)for(let t=0;t<V;t++){const e=new $n(n,Z,M,nt,ot);e.setPosition([t*at-Y/2+Z.radius,o*rt-K/2+Z.radius,0]);const a=o/nn;e.setUniform("u_metallic",{type:n.FLOAT,value:a});const i=1/V+t/V;e.setUniform("u_roughness",{type:n.FLOAT,value:i}),_.addChild(e),Pn.push(e)}const An=new an(n,"roughness",g,M,xn);An.setPosition([-Y/2+g.width/2,-K/2-g.height,0]);_.addChild(An);const gn=new an(n,"metallic",g,M,xn);gn.setPosition([-Y/2-g.height,-K/2+g.width/2,0]).setRotation([0,0,Math.PI*.5]);_.addChild(gn);const H=z(n,_.children[0].program,"Projection",["projMatrix","zNear","zFar"]),it=j(n,H.blockSize,0),G=z(n,_.children[0].program,"View",["viewMatrix","cameraPosition","time"]),st=j(n,G.blockSize,1),P=z(n,_.children[0].program,"Lighting",["pointLightPositions","pointLightColors","pointLightIntensity","diffuseLightMixFactor"]),lt=j(n,P.blockSize,2),Mn=z(n,_.children[0].program,"PostFX",["tonemappingMode"]),ct=j(n,Mn.blockSize,3),S=[],Fn=[],Un=[];for(let o=0;o<k;o++){S.push(new Float32Array(3));const t=[Math.random(),Math.random(),Math.random()];Fn.push(new Float32Array(t));const e=new qn(n);e.color=[...t,1],_.addChild(e),Un.push(e)}const tn=new pn(n,sn,M,Zn);tn.setUniform("u_equirectangularMap",{type:n.INT,value:0});const en=new pn(n,sn,M,tt);en.setUniform("u_environmentMap",{type:n.INT,value:0});const wn=new Qn(n,sn,M,Jn);n.getExtension("EXT_color_buffer_float");const on=new dn;on.src=b(hn);on.onload=()=>{bn(on)};requestAnimationFrame(Sn);Bn();window.addEventListener("resize",Bn);function Sn(o){requestAnimationFrame(Sn),d.updateViewMatrix(),n.bindBuffer(n.UNIFORM_BUFFER,it),n.bufferSubData(n.UNIFORM_BUFFER,H.uniforms.projMatrix.offset,d.projectionMatrix,0),n.bufferSubData(n.UNIFORM_BUFFER,H.uniforms.zNear.offset,new Float32Array([d.near]),0),n.bufferSubData(n.UNIFORM_BUFFER,H.uniforms.zFar.offset,new Float32Array([d.far]),0),n.bindBuffer(n.UNIFORM_BUFFER,st),n.bufferSubData(n.UNIFORM_BUFFER,G.uniforms.viewMatrix.offset,d.viewMatrix,0),n.bufferSubData(n.UNIFORM_BUFFER,G.uniforms.cameraPosition.offset,new Float32Array(d.position),0),n.bufferSubData(n.UNIFORM_BUFFER,G.uniforms.time.offset,new Float32Array([o]),0),n.bindBuffer(n.UNIFORM_BUFFER,lt);const t=o*.001;for(let e=0;e<k;e++){const a=Math.PI*2/k,i=[Math.cos(e*a+t)*(Math.sin(t)*3+6),Math.sin(e*a+t)*(Math.sin(t)*3+6),Math.cos(t)*10];S[e][0]=i[0],S[e][1]=i[1],S[e][2]=i[2],Un[e].setPosition(i).updateWorldMatrix(),n.bufferSubData(n.UNIFORM_BUFFER,P.uniforms.pointLightPositions.offset+e*P.uniforms.pointLightPositions.size*Float32Array.BYTES_PER_ELEMENT,S[e],0),n.bufferSubData(n.UNIFORM_BUFFER,P.uniforms.pointLightColors.offset+e*4*Float32Array.BYTES_PER_ELEMENT,Fn[e],0)}n.bufferSubData(n.UNIFORM_BUFFER,P.uniforms.pointLightIntensity.offset,vn,0),n.bufferSubData(n.UNIFORM_BUFFER,P.uniforms.diffuseLightMixFactor.offset,Rn,0),n.bindBuffer(n.UNIFORM_BUFFER,ct),n.bufferSubData(n.UNIFORM_BUFFER,Mn.uniforms.tonemappingMode.offset,Tn),n.enable(n.DEPTH_TEST),n.enable(n.BLEND),n.blendFunc(n.SRC_ALPHA,n.ONE_MINUS_SRC_ALPHA),n.viewport(0,0,n.drawingBufferWidth,n.drawingBufferHeight),n.clearColor(.1,.1,.1,1),n.clear(n.COLOR_BUFFER_BIT|n.DEPTH_BUFFER_BIT),n.pixelStorei(n.UNPACK_FLIP_Y_WEBGL,1),n.depthFunc(n.LEQUAL),wn.render(),n.depthFunc(n.LESS),_.updateWorldMatrix().render()}function bn(o){const t=n.createTexture();n.bindTexture(n.TEXTURE_2D,t),n.texImage2D(n.TEXTURE_2D,0,n.RGB9_E5,o.width,o.height,0,n.RGB,n.FLOAT,o.dataFloat),n.texParameteri(n.TEXTURE_2D,n.TEXTURE_WRAP_S,n.CLAMP_TO_EDGE),n.texParameteri(n.TEXTURE_2D,n.TEXTURE_WRAP_T,n.CLAMP_TO_EDGE),n.texParameteri(n.TEXTURE_2D,n.TEXTURE_MIN_FILTER,n.LINEAR),n.texParameteri(n.TEXTURE_2D,n.TEXTURE_MAG_FILTER,n.LINEAR),n.bindTexture(n.TEXTURE_2D,null),tn.texture=t;const e=n.createFramebuffer(),a=1024;n.bindFramebuffer(n.FRAMEBUFFER,e);const i=n.createRenderbuffer();n.bindRenderbuffer(n.RENDERBUFFER,i),n.renderbufferStorage(n.RENDERBUFFER,n.DEPTH_COMPONENT16,a,a),n.framebufferRenderbuffer(n.FRAMEBUFFER,n.DEPTH_ATTACHMENT,n.RENDERBUFFER,i);const s=n.createTexture();n.bindTexture(n.TEXTURE_CUBE_MAP,s);for(let r=0;r<6;r++){const p=n.TEXTURE_CUBE_MAP_POSITIVE_X+r;n.texImage2D(p,0,n.RGBA16F,a,a,0,n.RGBA,n.FLOAT,null),n.texParameteri(n.TEXTURE_CUBE_MAP,n.TEXTURE_WRAP_S,n.CLAMP_TO_EDGE),n.texParameteri(n.TEXTURE_CUBE_MAP,n.TEXTURE_WRAP_T,n.CLAMP_TO_EDGE),n.texParameteri(n.TEXTURE_CUBE_MAP,n.TEXTURE_WRAP_R,n.CLAMP_TO_EDGE),n.texParameteri(n.TEXTURE_CUBE_MAP,n.TEXTURE_MIN_FILTER,n.LINEAR),n.texParameteri(n.TEXTURE_CUBE_MAP,n.TEXTURE_MAG_FILTER,n.LINEAR)}n.bindFramebuffer(n.FRAMEBUFFER,e),n.viewport(0,0,a,a);for(let r=0;r<6;r++)n.framebufferTexture2D(n.FRAMEBUFFER,n.COLOR_ATTACHMENT0,n.TEXTURE_CUBE_MAP_POSITIVE_X+r,s,0),n.clear(n.COLOR_BUFFER_BIT|n.DEPTH_BUFFER_BIT),v.lookAt=un[r],v.upVector=mn[r],v.updateViewMatrix().updateProjectionViewMatrix(),tn.render(v);en.envTexture=s;const c=32,f=n.createTexture();n.bindTexture(n.TEXTURE_CUBE_MAP,f);for(let r=0;r<6;r++)n.texImage2D(n.TEXTURE_CUBE_MAP_POSITIVE_X+r,0,n.RGBA16F,c,c,0,n.RGBA,n.FLOAT,null);n.texParameteri(n.TEXTURE_CUBE_MAP,n.TEXTURE_WRAP_S,n.CLAMP_TO_EDGE),n.texParameteri(n.TEXTURE_CUBE_MAP,n.TEXTURE_WRAP_T,n.CLAMP_TO_EDGE),n.texParameteri(n.TEXTURE_CUBE_MAP,n.TEXTURE_WRAP_R,n.CLAMP_TO_EDGE),n.texParameteri(n.TEXTURE_CUBE_MAP,n.TEXTURE_MIN_FILTER,n.LINEAR),n.texParameteri(n.TEXTURE_CUBE_MAP,n.TEXTURE_MAG_FILTER,n.LINEAR),n.bindRenderbuffer(n.RENDERBUFFER,i),n.renderbufferStorage(n.RENDERBUFFER,n.DEPTH_COMPONENT24,c,c),n.viewport(0,0,c,c);for(let r=0;r<6;r++)n.framebufferTexture2D(n.FRAMEBUFFER,n.COLOR_ATTACHMENT0,n.TEXTURE_CUBE_MAP_POSITIVE_X+r,f,0),n.clear(n.COLOR_BUFFER_BIT|n.DEPTH_BUFFER_BIT),v.lookAt=un[r],v.upVector=mn[r],v.updateViewMatrix().updateProjectionViewMatrix(),en.render(v);n.bindFramebuffer(n.FRAMEBUFFER,null),wn.texture=s;for(const r of Pn)r.irradianceMapTexture=f;n.deleteTexture(t),n.deleteFramebuffer(e),n.deleteRenderbuffer(i)}function Bn(){d.aspect=innerWidth/innerHeight,d.updateProjectionMatrix(),R.width=innerWidth*devicePixelRatio,R.height=innerHeight*devicePixelRatio,R.style.setProperty("width",`${innerWidth}px`),R.style.setProperty("height",`${innerHeight}px`)}function ft(){const o=`
+  #ifdef USE_WORLD_POS
+    vWorldPos = worldPos.xyz;
+  #endif
+  
+  vLocalPos = aPosition.xyz;
+}`;const V=7,nn=7,Y=10,K=10,k=4,J=["aces","filmic","lottes","reinhard","reinhard2","uchimura","uncharted","unreal"],un=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]],mn=[[0,-1,0],[0,-1,0],[0,0,1],[0,0,-1],[0,-1,0],[0,-1,0]],et=new Map([["mon-valley",hn],["theatre",Vn],["tokyo",Hn]]),_n={useDiffuseLight:!0,image:"mon-valley"},Tn=new Float32Array([2]),vn=new Float32Array([40]),Rn=new Float32Array([1]),F=new On.exports.Pane;F.registerPlugin(Dn);ft();F.element.parentNode.style.setProperty("width","400px");F.addBlade({view:"list",label:"tone mapping mode",options:J.map(o=>({text:o,value:o})),value:J[2]}).on("change",({value:o})=>{Tn[0]=J.indexOf(o)});F.addBlade({view:"slider",label:"point light luminance",min:0,max:50,value:20}).on("change",({value:o})=>{vn[0]=o});F.addInput(_n,"useDiffuseLight",{label:"use environment diffuse light"}).on("change",({value:o})=>{Rn[0]=o?1:0});F.addInput(_n,"image",{label:"environment image",view:"thumbnail-list",options:[{text:"MonValley Lookout",value:"mon-valley",src:b(Gn)},{text:"Theatre Center",value:"theatre",src:b(yn)},{text:"Tokyo BigSight",value:"tokyo",src:b(Xn)}]}).on("change",({value:{value:o}})=>{const t=new dn;t.onload=()=>{bn(t)},t.src=b(et.get(o))});const R=document.createElement("canvas");document.body.appendChild(R);const n=R.getContext("webgl2"),rn=new kn(-innerWidth/2,innerWidth/2,innerHeight/2,-innerHeight/2,0,2);rn.position=[0,0,1];rn.lookAt=[0,0,0];rn.updateProjectionViewMatrix();const d=new En(45*Math.PI/180,innerWidth/innerHeight,.1,100);d.position=[5.43,.2,14.06];d.lookAt=[0,0,0];d.updateProjectionMatrix();new Wn(d,R,!1);const v=new En(90*Math.PI/180,1,.1,10).updateProjectionMatrix(),Z=zn({radius:.5,widthSegments:32,heightSegments:32}),g=jn({width:5,height:5/8}),sn=Yn({flipUVy:!0}),_=new Kn,ot={POINT_LIGHTS_COUNT:k.toString()},Pn=[],at=Y/V,rt=K/nn;for(let o=0;o<nn;o++)for(let t=0;t<V;t++){const e=new Qn(n,Z,M,tt,ot);e.setPosition([t*at-Y/2+Z.radius,o*rt-K/2+Z.radius,0]);const a=o/nn;e.setUniform("u_metallic",{type:n.FLOAT,value:a});const i=1/V+t/V;e.setUniform("u_roughness",{type:n.FLOAT,value:i}),_.addChild(e),Pn.push(e)}const An=new an(n,"roughness",g,M,xn);An.setPosition([-Y/2+g.width/2,-K/2-g.height,0]);_.addChild(An);const gn=new an(n,"metallic",g,M,xn);gn.setPosition([-Y/2-g.height,-K/2+g.width/2,0]).setRotation([0,0,Math.PI*.5]);_.addChild(gn);const H=z(n,_.children[0].program,"Projection",["projMatrix","zNear","zFar"]),it=j(n,H.blockSize,0),G=z(n,_.children[0].program,"View",["viewMatrix","cameraPosition","time"]),st=j(n,G.blockSize,1),P=z(n,_.children[0].program,"Lighting",["pointLightPositions","pointLightColors","pointLightIntensity","diffuseLightMixFactor"]),lt=j(n,P.blockSize,2),Mn=z(n,_.children[0].program,"PostFX",["tonemappingMode"]),ct=j(n,Mn.blockSize,3),S=[],Fn=[],Un=[];for(let o=0;o<k;o++){S.push(new Float32Array(3));const t=[Math.random(),Math.random(),Math.random()];Fn.push(new Float32Array(t));const e=new qn(n);e.color=[...t,1],_.addChild(e),Un.push(e)}const tn=new pn(n,sn,M,Zn);tn.setUniform("u_equirectangularMap",{type:n.INT,value:0});const en=new pn(n,sn,M,Jn);en.setUniform("u_environmentMap",{type:n.INT,value:0});const wn=new $n(n,sn,M,nt);n.getExtension("EXT_color_buffer_float");const on=new dn;on.src=b(hn);on.onload=()=>{bn(on)};requestAnimationFrame(Sn);Bn();window.addEventListener("resize",Bn);function Sn(o){requestAnimationFrame(Sn),d.updateViewMatrix(),n.bindBuffer(n.UNIFORM_BUFFER,it),n.bufferSubData(n.UNIFORM_BUFFER,H.uniforms.projMatrix.offset,d.projectionMatrix,0),n.bufferSubData(n.UNIFORM_BUFFER,H.uniforms.zNear.offset,new Float32Array([d.near]),0),n.bufferSubData(n.UNIFORM_BUFFER,H.uniforms.zFar.offset,new Float32Array([d.far]),0),n.bindBuffer(n.UNIFORM_BUFFER,st),n.bufferSubData(n.UNIFORM_BUFFER,G.uniforms.viewMatrix.offset,d.viewMatrix,0),n.bufferSubData(n.UNIFORM_BUFFER,G.uniforms.cameraPosition.offset,new Float32Array(d.position),0),n.bufferSubData(n.UNIFORM_BUFFER,G.uniforms.time.offset,new Float32Array([o]),0),n.bindBuffer(n.UNIFORM_BUFFER,lt);const t=o*.001;for(let e=0;e<k;e++){const a=Math.PI*2/k,i=[Math.cos(e*a+t)*(Math.sin(t)*3+6),Math.sin(e*a+t)*(Math.sin(t)*3+6),Math.cos(t)*10];S[e][0]=i[0],S[e][1]=i[1],S[e][2]=i[2],Un[e].setPosition(i).updateWorldMatrix(),n.bufferSubData(n.UNIFORM_BUFFER,P.uniforms.pointLightPositions.offset+e*P.uniforms.pointLightPositions.size*Float32Array.BYTES_PER_ELEMENT,S[e],0),n.bufferSubData(n.UNIFORM_BUFFER,P.uniforms.pointLightColors.offset+e*4*Float32Array.BYTES_PER_ELEMENT,Fn[e],0)}n.bufferSubData(n.UNIFORM_BUFFER,P.uniforms.pointLightIntensity.offset,vn,0),n.bufferSubData(n.UNIFORM_BUFFER,P.uniforms.diffuseLightMixFactor.offset,Rn,0),n.bindBuffer(n.UNIFORM_BUFFER,ct),n.bufferSubData(n.UNIFORM_BUFFER,Mn.uniforms.tonemappingMode.offset,Tn),n.enable(n.DEPTH_TEST),n.enable(n.BLEND),n.blendFunc(n.SRC_ALPHA,n.ONE_MINUS_SRC_ALPHA),n.viewport(0,0,n.drawingBufferWidth,n.drawingBufferHeight),n.clearColor(.1,.1,.1,1),n.clear(n.COLOR_BUFFER_BIT|n.DEPTH_BUFFER_BIT),n.pixelStorei(n.UNPACK_FLIP_Y_WEBGL,1),n.depthFunc(n.LEQUAL),wn.render(),n.depthFunc(n.LESS),_.updateWorldMatrix().render()}function bn(o){const t=n.createTexture();n.bindTexture(n.TEXTURE_2D,t),n.texImage2D(n.TEXTURE_2D,0,n.RGB9_E5,o.width,o.height,0,n.RGB,n.FLOAT,o.dataFloat),n.texParameteri(n.TEXTURE_2D,n.TEXTURE_WRAP_S,n.CLAMP_TO_EDGE),n.texParameteri(n.TEXTURE_2D,n.TEXTURE_WRAP_T,n.CLAMP_TO_EDGE),n.texParameteri(n.TEXTURE_2D,n.TEXTURE_MIN_FILTER,n.LINEAR),n.texParameteri(n.TEXTURE_2D,n.TEXTURE_MAG_FILTER,n.LINEAR),n.bindTexture(n.TEXTURE_2D,null),tn.texture=t;const e=n.createFramebuffer(),a=1024;n.bindFramebuffer(n.FRAMEBUFFER,e);const i=n.createRenderbuffer();n.bindRenderbuffer(n.RENDERBUFFER,i),n.renderbufferStorage(n.RENDERBUFFER,n.DEPTH_COMPONENT16,a,a),n.framebufferRenderbuffer(n.FRAMEBUFFER,n.DEPTH_ATTACHMENT,n.RENDERBUFFER,i);const s=n.createTexture();n.bindTexture(n.TEXTURE_CUBE_MAP,s);for(let r=0;r<6;r++){const p=n.TEXTURE_CUBE_MAP_POSITIVE_X+r;n.texImage2D(p,0,n.RGBA16F,a,a,0,n.RGBA,n.FLOAT,null),n.texParameteri(n.TEXTURE_CUBE_MAP,n.TEXTURE_WRAP_S,n.CLAMP_TO_EDGE),n.texParameteri(n.TEXTURE_CUBE_MAP,n.TEXTURE_WRAP_T,n.CLAMP_TO_EDGE),n.texParameteri(n.TEXTURE_CUBE_MAP,n.TEXTURE_WRAP_R,n.CLAMP_TO_EDGE),n.texParameteri(n.TEXTURE_CUBE_MAP,n.TEXTURE_MIN_FILTER,n.LINEAR),n.texParameteri(n.TEXTURE_CUBE_MAP,n.TEXTURE_MAG_FILTER,n.LINEAR)}n.bindFramebuffer(n.FRAMEBUFFER,e),n.viewport(0,0,a,a);for(let r=0;r<6;r++)n.framebufferTexture2D(n.FRAMEBUFFER,n.COLOR_ATTACHMENT0,n.TEXTURE_CUBE_MAP_POSITIVE_X+r,s,0),n.clear(n.COLOR_BUFFER_BIT|n.DEPTH_BUFFER_BIT),v.lookAt=un[r],v.upVector=mn[r],v.updateViewMatrix().updateProjectionViewMatrix(),tn.render(v);en.envTexture=s;const c=32,f=n.createTexture();n.bindTexture(n.TEXTURE_CUBE_MAP,f);for(let r=0;r<6;r++)n.texImage2D(n.TEXTURE_CUBE_MAP_POSITIVE_X+r,0,n.RGBA16F,c,c,0,n.RGBA,n.FLOAT,null);n.texParameteri(n.TEXTURE_CUBE_MAP,n.TEXTURE_WRAP_S,n.CLAMP_TO_EDGE),n.texParameteri(n.TEXTURE_CUBE_MAP,n.TEXTURE_WRAP_T,n.CLAMP_TO_EDGE),n.texParameteri(n.TEXTURE_CUBE_MAP,n.TEXTURE_WRAP_R,n.CLAMP_TO_EDGE),n.texParameteri(n.TEXTURE_CUBE_MAP,n.TEXTURE_MIN_FILTER,n.LINEAR),n.texParameteri(n.TEXTURE_CUBE_MAP,n.TEXTURE_MAG_FILTER,n.LINEAR),n.bindRenderbuffer(n.RENDERBUFFER,i),n.renderbufferStorage(n.RENDERBUFFER,n.DEPTH_COMPONENT24,c,c),n.viewport(0,0,c,c);for(let r=0;r<6;r++)n.framebufferTexture2D(n.FRAMEBUFFER,n.COLOR_ATTACHMENT0,n.TEXTURE_CUBE_MAP_POSITIVE_X+r,f,0),n.clear(n.COLOR_BUFFER_BIT|n.DEPTH_BUFFER_BIT),v.lookAt=un[r],v.upVector=mn[r],v.updateViewMatrix().updateProjectionViewMatrix(),en.render(v);n.bindFramebuffer(n.FRAMEBUFFER,null),wn.texture=s;for(const r of Pn)r.irradianceMapTexture=f;n.deleteTexture(t),n.deleteFramebuffer(e),n.deleteRenderbuffer(i)}function Bn(){d.aspect=innerWidth/innerHeight,d.updateProjectionMatrix(),R.width=innerWidth*devicePixelRatio,R.height=innerHeight*devicePixelRatio,R.style.setProperty("width",`${innerWidth}px`),R.style.setProperty("height",`${innerHeight}px`)}function ft(){const o=`
     .tp-thumbv_ovl .tp-thumbv_opt:first-of-type {
       display: none !important;
     }
