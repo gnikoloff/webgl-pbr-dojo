@@ -14,6 +14,14 @@ npm run setup
 npm run dev
 ```
 
+## Dependencies
+
+- [`Minimal WebGL2 library`](https://github.com/gnikoloff/hwoa-rang-gl2)
+- [`Tweening utils`](https://github.com/gnikoloff/hwoa-rang-tween)
+- [`3d math helpers`](https://github.com/gnikoloff/hwoa-rang-math)
+- [KTX 2.0 (.ktx2) parser and serializer](https://github.com/donmccurdy/KTX-Parse)
+- [Tweakpane](https://tweakpane.github.io/docs/)
+
 ## References
 
 - [The PBR chapter in LearnOpenGL](https://learnopengl.com/PBR/Theory)
