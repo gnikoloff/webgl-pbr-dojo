@@ -1,14 +1,47 @@
-# Physically based rendering Dojo
+# WebGL Physically Based Rendering Playground
 
-## Place to explore theory and math behind PBR
+![Screenshot from the renderer showcasing a specific set of lighting parameters](yoon-render-engine-preview-0.png)
+![Screenshot from the renderer showcasing a different set of lighting parameters](yoon-render-engine-preview-1.png)
 
-Please not this is not production ready code, rather a playground to test the math and concepts behind PBR. In fact, these demos do not currently work on:
+WebGL 2.0 physically-based renderer featuring IBL with environment map convolution, HDR tone mapping, analytical lights, and the metallic-roughness PBR workflow. Implementation based on LearnOpenGL's PBR theory.
 
-- Firefox, due to annoying GLSL 300 shader UBO array definition bug. You can refer to it [here](https://bugzilla.mozilla.org/show_bug.cgi?id=1755973)
-- Safari, due to inability to render HDR image to half floating point framebuffer. It should work, however due to my limited time on this side project and the focus being on PBR concepts, I can't bother to fix it
+## Building Locally
 
-### References
+```bash
+git clone --recurse-submodules git@github.com:gnikoloff/webgl-pbr-dojo.git
+cd webgl-pbr-dojo
+npm run setup
+npm run dev
+```
+
+## References
 
 - [The PBR chapter in LearnOpenGL](https://learnopengl.com/PBR/Theory)
-- [This Youtube playlist on electric lighting principles](https://www.youtube.com/watch?v=iman_gDntWA&list=PL7eNzIRgKe07Y_fxBR9Df3WdzN3ajI8uu)
 - [Real Shading in Unreal Engine 4](https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf)
+
+## License
+
+This is free and unencumbered software released into the public domain.
+
+Anyone is free to copy, modify, publish, use, compile, sell, or
+distribute this software, either in source code form or as a compiled
+binary, for any purpose, commercial or non-commercial, and by any
+means.
+
+In jurisdictions that recognize copyright laws, the author or authors
+of this software dedicate any and all copyright interest in the
+software to the public domain. We make this dedication for the benefit
+of the public at large and to the detriment of our heirs and
+successors. We intend this dedication to be an overt act of
+relinquishment in perpetuity of all present and future rights to this
+software under copyright law.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+For more information, please refer to <http://unlicense.org/>
