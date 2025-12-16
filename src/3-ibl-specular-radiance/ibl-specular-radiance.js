@@ -29,6 +29,19 @@ import CubemapConverter from './cubemap-converter'
 import LightDebug from '../shared/light-debug'
 import PlaneDebug from '../shared/plane-debug'
 
+import { normalizeRGB } from '../shared/color-utils'
+import { isTouchDevice } from '../shared/interaction-utils'
+
+// shaders
+import CONVOLUTE_BDRF_FRAGMENT_SHADER_SRC from './shaders/convolute-bdrf-map.frag'
+import CONVOLUTE_IRRADIANCE_MAP_FRAGMENT_SHADER_SRC from './shaders/convolute-irradiance-map.frag'
+import CONVOLUTE_PRE_FILTERED_ENVIRONMENT_MAP_SHADER_SRC from './shaders/convolute-pre-filter-environment-map.frag'
+import EQIORECTANGULAR_TO_CUBEMAP_FRAGMENT_SHADER_SRC from './shaders/equirectangular-to-cubemap.frag'
+import LABEL_FRAGMENT_SHADER_SRC from './shaders/label.frag'
+import SKYBOX_FRAGMENT_SHADER_SRC from './shaders/skybox.frag'
+import SPHERE_FRAGMENT_SHADER_SRC from './shaders/sphere.frag'
+import UBER_VERTEX_SHADER_SRC from './shaders/uber.vert'
+
 // import ToHalfFloatWebWorker from '../shared/to-half-float-web-worker?worker'
 
 // IBL environment
@@ -136,18 +149,6 @@ import roughnessMap2ETC2 from '../images/pbr/grass/leafy-grass2-roughness_etc2.k
 import roughnessMap2PVRTC from '../images/pbr/grass/leafy-grass2-roughness_pvrtc.ktx'
 import roughnessMap2S3TC from '../images/pbr/grass/leafy-grass2-roughness_s3tc.ktx'
 
-// shaders
-import { normalizeRGB } from '../shared/color-utils'
-import { isTouchDevice } from '../shared/interaction-utils'
-import CONVOLUTE_BDRF_FRAGMENT_SHADER_SRC from './shaders/convolute-bdrf-map.frag'
-import CONVOLUTE_IRRADIANCE_MAP_FRAGMENT_SHADER_SRC from './shaders/convolute-irradiance-map.frag'
-import CONVOLUTE_PRE_FILTERED_ENVIRONMENT_MAP_SHADER_SRC from './shaders/convolute-pre-filter-environment-map.frag'
-import EQIORECTANGULAR_TO_CUBEMAP_FRAGMENT_SHADER_SRC from './shaders/equirectangular-to-cubemap.frag'
-import LABEL_FRAGMENT_SHADER_SRC from './shaders/label.frag'
-import SKYBOX_FRAGMENT_SHADER_SRC from './shaders/skybox.frag'
-import SPHERE_FRAGMENT_SHADER_SRC from './shaders/sphere.frag'
-import UBER_VERTEX_SHADER_SRC from './shaders/uber.vert'
-
 const SPHERE_GRID_X_COUNT = 7
 const SPHERE_GRID_Y_COUNT = 7
 const SPHERE_GRID_WIDTH = 10
@@ -155,7 +156,7 @@ const SPHERE_GRID_HEIGHT = 10
 const POINT_LIGHT_POSITIONS_COUNT = 4
 const BDRF_INTEGRATION_PLANE_WIDTH = 512
 const BDRF_INTEGRATION_PLANE_HEIGHT = 512
-const SKYBOX_SIDE_SIZE = 512
+const SKYBOX_SIDE_SIZE = 1024
 
 let convolutionState = null
 
@@ -723,6 +724,13 @@ Promise.all([
 requestAnimationFrame(drawFrame)
 onResize()
 window.addEventListener('resize', onResize)
+addEventListener('DOMContentLoaded', () => {
+  document.getElementById('header').style.display = 'block'
+  var el = isTouchDevice()
+    ? document.getElementById('instructions-touch')
+    : document.getElementById('instructions-desktop')
+  el.style.display = 'block'
+})
 
 function drawFrame(ts) {
   requestAnimationFrame(drawFrame)
