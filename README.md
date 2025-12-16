@@ -1,7 +1,7 @@
 # WebGL Physically Based Rendering Playground
 
 ![Screenshot from the renderer showcasing a different set of lighting parameters](webgl-pbr-export-3.png)
-![Screenshot from the renderer showcasing a specific set of lighting parameters](webgl-pbr-export-2.png)
+![Screenshot from the renderer showcasing a specific set of lighting parameters](webgl-pbr-export-4.png)
 
 WebGL 2.0 physically-based renderer featuring IBL with environment map convolution, HDR tone mapping, analytical lights, and the metallic-roughness PBR workflow. Implementation based on LearnOpenGL's PBR theory.
 
