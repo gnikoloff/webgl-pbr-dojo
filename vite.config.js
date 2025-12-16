@@ -1,8 +1,6 @@
 import { defineConfig, loadEnv } from 'vite'
 import glsl from 'vite-plugin-glsl'
 
-import EXAMPLES from './EXAMPLES.json'
-
 export default ({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) }
 
@@ -11,16 +9,14 @@ export default ({ mode }) => {
     assetsInclude: ['**/*.hdr', '**/*.ktx', '**/*.dds'],
     build: {
       assetsInlineLimit: 0,
-      outDir: 'site/assets/',
+      outDir: 'docs/',
       emptyOutDir: false,
       rollupOptions: {
         output: {
           assetFileNames: '[name][extname]',
           entryFileNames: '[name].js',
         },
-        input: process.env.DEV
-          ? ''
-          : EXAMPLES.map(({ id }, i) => `src/${i}-${id}/${id}.js`),
+        input: 'index.html',
       },
     },
   })

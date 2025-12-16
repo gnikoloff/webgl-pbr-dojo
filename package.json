@@ -15,13 +15,7 @@
     "setup:tween": "cd lib/hwoa-rang-tween && npm i && npm run start:dev",
     "dev": "DEV=1 vite --host",
     "build": "vite build",
-    "preview": "vite preview",
-    "clean:examples": "del site/examples/** !site/examples/",
-    "copy:examples": "copy EXAMPLES.json site/_data",
-    "create:examples": "node make-example-markdown-files.js",
-    "clean:docs": "del docs",
-    "out:docs": "npx eleventy --config=./eleventy.js --serve",
-    "serve:docs": "run-s build clean:examples create:examples copy:examples clean:docs out:docs"
+    "preview": "vite preview"
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.1.2",
