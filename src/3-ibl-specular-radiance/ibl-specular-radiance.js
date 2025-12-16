@@ -45,12 +45,15 @@ import UBER_VERTEX_SHADER_SRC from './shaders/uber.vert'
 // import ToHalfFloatWebWorker from '../shared/to-half-float-web-worker?worker'
 
 // IBL environment
-import hdrImageSrc1 from '../images/environment/A_little_paris_eiffel_tower_1k.hdr'
-import hdrImageSrc0 from '../images/environment/A_moonlit_golf_1k.hdr'
-import hdrImageSrc2 from '../images/environment/A_qwantani_moon_noon_puresky_1k.hdr'
 import skyboxImageSrc1 from '../images/environment/little_paris_eiffel_tower.png'
+import hdrImageSrc1 from '../images/environment/little_paris_eiffel_tower_1k.hdr'
 import skyboxImageSrc0 from '../images/environment/moonlit_golf.png'
+import hdrImageSrc0 from '../images/environment/moonlit_golf_1k.hdr'
+import hdrImageSrc2 from '../images/environment/qwantani_moon_noon_puresky_1k.hdr'
 import skyboxImageSrc2 from '../images/environment/qwantani_moon_noon_puresky_1k.png'
+
+import skyboxImageSrc3 from '../images/environment/studio_small_08.png'
+import hdrImageSrc3 from '../images/environment/studio_small_08_1k.hdr'
 
 // PBR compressed textures - S3TC, ASTC, ETC1, ETC2, PVRTC
 // PBR 1
@@ -309,6 +312,7 @@ const SKYBOX_IMAGE_SOURCES = new Map([
   ['mon-valley', hdrImageSrc0],
   ['theatre', hdrImageSrc1],
   ['tokyo', hdrImageSrc2],
+  ['studio', hdrImageSrc3]
 ])
 
 const TWEAK_PARAMS = {
@@ -341,7 +345,7 @@ pane.addInput(TWEAK_PARAMS, 'playAnim', {
 pane
   .addBlade({
     view: 'list',
-    label: 'tone mapping mode',
+    label: 'Tone Mapping Mode',
     options: TONEMAPPING_MODES.map((text) => ({ text, value: text })),
     value: TONEMAPPING_MODES[2],
   })
@@ -351,7 +355,7 @@ pane
 pane
   .addBlade({
     view: 'slider',
-    label: 'point light luminance',
+    label: 'Point Light Luminance',
     min: 0,
     max: 50,
     value: pointLightIntensityFloat32[0],
@@ -362,21 +366,21 @@ pane
 pane
 
   .addInput(TWEAK_PARAMS, 'useEnvDiffuseLight', {
-    label: 'use environment diffuse light',
+    label: 'Use Environment Diffuse Light',
   })
   .on('change', ({ value }) => {
     diffuseLightMixFactorFloat32[0] = value ? 1 : 0
   })
 pane
   .addInput(TWEAK_PARAMS, 'useEnvSpecularLight', {
-    label: 'use environment specular light',
+    label: 'Use Environment Specular Light',
   })
   .on('change', ({ value }) => {
     specularLightMixFactorFloat32[0] = value
   })
 pane
   .addInput(TWEAK_PARAMS, 'image', {
-    label: 'environment image',
+    label: 'Environment Image',
     view: 'thumbnail-list',
     options: [
       {
@@ -393,6 +397,11 @@ pane
         text: 'Qwantani Noon',
         value: 'tokyo',
         src: transformAssetSrc(skyboxImageSrc2),
+      },
+      {
+        text: 'Studio Small',
+        value: 'studio',
+        src: transformAssetSrc(skyboxImageSrc3),
       },
     ],
   })
