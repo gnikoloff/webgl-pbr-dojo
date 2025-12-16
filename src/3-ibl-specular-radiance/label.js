@@ -1,4 +1,5 @@
 import { Drawable } from '../lib/hwoa-rang-gl2/dist'
+import { getAnisotropicFilteringExtension } from '../shared/supports-anisotropic-filtering'
 
 export default class Label extends Drawable {
   #texture
@@ -114,6 +115,17 @@ export default class Label extends Drawable {
       canvasTexture,
     )
     gl.generateMipmap(gl.TEXTURE_2D)
+
+    const anisotropicExt = getAnisotropicFilteringExtension(gl)
+    if (anisotropicExt != null) {
+      const max = gl.getParameter(anisotropicExt.MAX_TEXTURE_MAX_ANISOTROPY_EXT)
+      gl.texParameterf(
+        gl.TEXTURE_2D,
+        anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT,
+        max,
+      )
+    }
+
     gl.bindTexture(gl.TEXTURE_2D, null)
 
     this.#projectionUBOIndex = gl.getUniformBlockIndex(

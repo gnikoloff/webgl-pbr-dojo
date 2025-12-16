@@ -1,29 +1,30 @@
-// import { Spector } from 'spectorjs'
+// import 'https://greggman.github.io/webgl-lint/webgl-lint.js'
+// // import { Spector } from 'spectorjs'
 import { Pane } from 'tweakpane'
 import * as TweakpaneThumbnailListPlugin from 'tweakpane-plugin-thumbnail-list'
 
 import HDRImage from '../lib/hdr-png'
 
 import {
+  CameraController,
+  createAndBindUBOToBase,
+  createBox,
+  createPlane,
   createSphere,
   createUniformBlockInfo,
-  createAndBindUBOToBase,
-  PerspectiveCamera,
-  CameraController,
-  SceneNode,
   OrthographicCamera,
-  createPlane,
-  createBox,
+  PerspectiveCamera,
+  SceneNode,
 } from '../lib/hwoa-rang-gl2'
 
 import loadCorrectCompressedTexture from '../shared/load-correct-compressed-texture'
 
-import Sphere from './sphere'
 import Label from './label'
 import Skybox from './skybox'
+import Sphere from './sphere'
 
-import CubemapConverter from './cubemap-converter'
 import BRDFIntegrationPlane from './bdrf-integration-plane'
+import CubemapConverter from './cubemap-converter'
 
 import LightDebug from '../shared/light-debug'
 import PlaneDebug from '../shared/plane-debug'
@@ -31,119 +32,121 @@ import PlaneDebug from '../shared/plane-debug'
 // import ToHalfFloatWebWorker from '../shared/to-half-float-web-worker?worker'
 
 // IBL environment
-import hdrImageSrc0 from '../images/environment/MonValley_A_LookoutPoint_2k.hdr'
-import skyboxImageSrc0 from '../images/environment/MonValley_A_LookoutPoint_Thumb.jpg'
-import hdrImageSrc1 from '../images/environment/Theatre-Center_2k.hdr'
-import skyboxImageSrc1 from '../images/environment/Theatre-Center_Thumb.jpg'
-import hdrImageSrc2 from '../images/environment/Tokyo_BigSight_3k.hdr'
-import skyboxImageSrc2 from '../images/environment/Tokyo_BigSight_thumb.jpg'
+import hdrImageSrc1 from '../images/environment/A_little_paris_eiffel_tower_1k.hdr'
+import hdrImageSrc0 from '../images/environment/A_moonlit_golf_1k.hdr'
+import hdrImageSrc2 from '../images/environment/A_qwantani_moon_noon_puresky_1k.hdr'
+import skyboxImageSrc1 from '../images/environment/little_paris_eiffel_tower.png'
+import skyboxImageSrc0 from '../images/environment/moonlit_golf.png'
+import skyboxImageSrc2 from '../images/environment/qwantani_moon_noon_puresky_1k.png'
 
 // PBR compressed textures - S3TC, ASTC, ETC1, ETC2, PVRTC
 // PBR 1
 // albedo
-import albedoMap0S3TC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-albedo_s3tc.ktx'
 import albedoMap0ASTC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-albedo_astc.ktx'
 import albedoMap0ETC1 from '../images/pbr/worn-shiny-metal/worn-shiny-metal-albedo_etc1.ktx'
 import albedoMap0ETC2 from '../images/pbr/worn-shiny-metal/worn-shiny-metal-albedo_etc2.ktx'
 import albedoMap0PVRTC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-albedo_pvrtc.ktx'
+import albedoMap0S3TC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-albedo_s3tc.ktx'
 // ao
-import aoMap0S3TC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-ao_s3tc.ktx'
 import aoMap0ASTC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-ao_astc.ktx'
 import aoMap0ETC1 from '../images/pbr/worn-shiny-metal/worn-shiny-metal-ao_etc1.ktx'
 import aoMap0ETC2 from '../images/pbr/worn-shiny-metal/worn-shiny-metal-ao_etc2.ktx'
 import aoMap0PVRTC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-ao_pvrtc.ktx'
+import aoMap0S3TC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-ao_s3tc.ktx'
 // normal
-import normalMap0S3TC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Normal-ogl_s3tc.ktx'
 import normalMap0ASTC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Normal-ogl_astc.ktx'
 import normalMap0ETC1 from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Normal-ogl_etc1.ktx'
 import normalMap0ETC2 from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Normal-ogl_etc2.ktx'
 import normalMap0PVRTC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Normal-ogl_pvrtc.ktx'
+import normalMap0S3TC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Normal-ogl_s3tc.ktx'
 // metallic
-import metallicMap0S3TC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Metallic_s3tc.ktx'
 import metallicMap0ASTC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Metallic_astc.ktx'
 import metallicMap0ETC1 from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Metallic_etc1.ktx'
 import metallicMap0ETC2 from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Metallic_etc2.ktx'
 import metallicMap0PVRTC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Metallic_pvrtc.ktx'
+import metallicMap0S3TC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Metallic_s3tc.ktx'
 // roughness
-import roughnessMap0S3TC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Roughness_s3tc.ktx'
 import roughnessMap0ASTC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Roughness_astc.ktx'
 import roughnessMap0ETC1 from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Roughness_etc1.ktx'
 import roughnessMap0ETC2 from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Roughness_etc2.ktx'
 import roughnessMap0PVRTC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Roughness_pvrtc.ktx'
+import roughnessMap0S3TC from '../images/pbr/worn-shiny-metal/worn-shiny-metal-Roughness_s3tc.ktx'
 
 // PBR 2
 // albedo
-import albedoMap1S3TC from '../images/pbr/rust/rustediron2_basecolor_s3tc.ktx'
 import albedoMap1ASTC from '../images/pbr/rust/rustediron2_basecolor_astc.ktx'
 import albedoMap1ETC1 from '../images/pbr/rust/rustediron2_basecolor_etc1.ktx'
 import albedoMap1ETC2 from '../images/pbr/rust/rustediron2_basecolor_etc2.ktx'
 import albedoMap1PVRTC from '../images/pbr/rust/rustediron2_basecolor_pvrtc.ktx'
+import albedoMap1S3TC from '../images/pbr/rust/rustediron2_basecolor_s3tc.ktx'
 // ao
-import aoMap1S3TC from '../images/pbr/rust/rustediron2_ao_s3tc.ktx'
 import aoMap1ASTC from '../images/pbr/rust/rustediron2_ao_astc.ktx'
 import aoMap1ETC1 from '../images/pbr/rust/rustediron2_ao_etc1.ktx'
 import aoMap1ETC2 from '../images/pbr/rust/rustediron2_ao_etc2.ktx'
 import aoMap1PVRTC from '../images/pbr/rust/rustediron2_ao_pvrtc.ktx'
+import aoMap1S3TC from '../images/pbr/rust/rustediron2_ao_s3tc.ktx'
 // normal
-import normalMap1S3TC from '../images/pbr/rust/rustediron2_normal_s3tc.ktx'
 import normalMap1ASTC from '../images/pbr/rust/rustediron2_normal_astc.ktx'
 import normalMap1ETC1 from '../images/pbr/rust/rustediron2_normal_etc1.ktx'
 import normalMap1ETC2 from '../images/pbr/rust/rustediron2_normal_etc2.ktx'
 import normalMap1PVRTC from '../images/pbr/rust/rustediron2_normal_pvrtc.ktx'
+import normalMap1S3TC from '../images/pbr/rust/rustediron2_normal_s3tc.ktx'
 // metallic
-import metallicMap1S3TC from '../images/pbr/rust/rustediron2_metallic_s3tc.ktx'
 import metallicMap1ASTC from '../images/pbr/rust/rustediron2_metallic_astc.ktx'
 import metallicMap1ETC1 from '../images/pbr/rust/rustediron2_metallic_etc1.ktx'
 import metallicMap1ETC2 from '../images/pbr/rust/rustediron2_metallic_etc2.ktx'
 import metallicMap1PVRTC from '../images/pbr/rust/rustediron2_metallic_pvrtc.ktx'
+import metallicMap1S3TC from '../images/pbr/rust/rustediron2_metallic_s3tc.ktx'
 // roughness
-import roughnessMap1S3TC from '../images/pbr/rust/rustediron2_roughness_s3tc.ktx'
 import roughnessMap1ASTC from '../images/pbr/rust/rustediron2_roughness_astc.ktx'
 import roughnessMap1ETC1 from '../images/pbr/rust/rustediron2_roughness_etc1.ktx'
 import roughnessMap1ETC2 from '../images/pbr/rust/rustediron2_roughness_etc2.ktx'
 import roughnessMap1PVRTC from '../images/pbr/rust/rustediron2_roughness_pvrtc.ktx'
+import roughnessMap1S3TC from '../images/pbr/rust/rustediron2_roughness_s3tc.ktx'
 
 // PBR 3
 // albedo
-import albedoMap2S3TC from '../images/pbr/grass/leafy-grass2-albedo_s3tc.ktx'
 import albedoMap2ASTC from '../images/pbr/grass/leafy-grass2-albedo_astc.ktx'
 import albedoMap2ETC1 from '../images/pbr/grass/leafy-grass2-albedo_etc1.ktx'
 import albedoMap2ETC2 from '../images/pbr/grass/leafy-grass2-albedo_etc2.ktx'
 import albedoMap2PVRTC from '../images/pbr/grass/leafy-grass2-albedo_pvrtc.ktx'
+import albedoMap2S3TC from '../images/pbr/grass/leafy-grass2-albedo_s3tc.ktx'
 // ao
-import aoMap2S3TC from '../images/pbr/grass/leafy-grass2-ao_s3tc.ktx'
 import aoMap2ASTC from '../images/pbr/grass/leafy-grass2-ao_astc.ktx'
 import aoMap2ETC1 from '../images/pbr/grass/leafy-grass2-ao_etc1.ktx'
 import aoMap2ETC2 from '../images/pbr/grass/leafy-grass2-ao_etc2.ktx'
 import aoMap2PVRTC from '../images/pbr/grass/leafy-grass2-ao_pvrtc.ktx'
+import aoMap2S3TC from '../images/pbr/grass/leafy-grass2-ao_s3tc.ktx'
 // normal
-import normalMap2S3TC from '../images/pbr/grass/leafy-grass2-normal-ogl_s3tc.ktx'
 import normalMap2ASTC from '../images/pbr/grass/leafy-grass2-normal-ogl_astc.ktx'
 import normalMap2ETC1 from '../images/pbr/grass/leafy-grass2-normal-ogl_etc1.ktx'
 import normalMap2ETC2 from '../images/pbr/grass/leafy-grass2-normal-ogl_etc2.ktx'
 import normalMap2PVRTC from '../images/pbr/grass/leafy-grass2-normal-ogl_pvrtc.ktx'
+import normalMap2S3TC from '../images/pbr/grass/leafy-grass2-normal-ogl_s3tc.ktx'
 // metallic
-import metallicMap2S3TC from '../images/pbr/grass/leafy-grass2-metallic_s3tc.ktx'
 import metallicMap2ASTC from '../images/pbr/grass/leafy-grass2-metallic_astc.ktx'
 import metallicMap2ETC1 from '../images/pbr/grass/leafy-grass2-metallic_etc1.ktx'
 import metallicMap2ETC2 from '../images/pbr/grass/leafy-grass2-metallic_etc2.ktx'
 import metallicMap2PVRTC from '../images/pbr/grass/leafy-grass2-metallic_pvrtc.ktx'
+import metallicMap2S3TC from '../images/pbr/grass/leafy-grass2-metallic_s3tc.ktx'
 // roughness
-import roughnessMap2S3TC from '../images/pbr/grass/leafy-grass2-roughness_s3tc.ktx'
 import roughnessMap2ASTC from '../images/pbr/grass/leafy-grass2-roughness_astc.ktx'
 import roughnessMap2ETC1 from '../images/pbr/grass/leafy-grass2-roughness_etc1.ktx'
 import roughnessMap2ETC2 from '../images/pbr/grass/leafy-grass2-roughness_etc2.ktx'
 import roughnessMap2PVRTC from '../images/pbr/grass/leafy-grass2-roughness_pvrtc.ktx'
+import roughnessMap2S3TC from '../images/pbr/grass/leafy-grass2-roughness_s3tc.ktx'
 
 // shaders
-import UBER_VERTEX_SHADER_SRC from './shaders/uber.vert'
-import SKYBOX_FRAGMENT_SHADER_SRC from './shaders/skybox.frag'
-import EQIORECTANGULAR_TO_CUBEMAP_FRAGMENT_SHADER_SRC from './shaders/equirectangular-to-cubemap.frag'
-import SPHERE_FRAGMENT_SHADER_SRC from './shaders/sphere.frag'
-import LABEL_FRAGMENT_SHADER_SRC from './shaders/label.frag'
+import { normalizeRGB } from '../shared/color-utils'
+import { isTouchDevice } from '../shared/interaction-utils'
+import CONVOLUTE_BDRF_FRAGMENT_SHADER_SRC from './shaders/convolute-bdrf-map.frag'
 import CONVOLUTE_IRRADIANCE_MAP_FRAGMENT_SHADER_SRC from './shaders/convolute-irradiance-map.frag'
 import CONVOLUTE_PRE_FILTERED_ENVIRONMENT_MAP_SHADER_SRC from './shaders/convolute-pre-filter-environment-map.frag'
-import CONVOLUTE_BDRF_FRAGMENT_SHADER_SRC from './shaders/convolute-bdrf-map.frag'
+import EQIORECTANGULAR_TO_CUBEMAP_FRAGMENT_SHADER_SRC from './shaders/equirectangular-to-cubemap.frag'
+import LABEL_FRAGMENT_SHADER_SRC from './shaders/label.frag'
+import SKYBOX_FRAGMENT_SHADER_SRC from './shaders/skybox.frag'
+import SPHERE_FRAGMENT_SHADER_SRC from './shaders/sphere.frag'
+import UBER_VERTEX_SHADER_SRC from './shaders/uber.vert'
 
 const SPHERE_GRID_X_COUNT = 7
 const SPHERE_GRID_Y_COUNT = 7
@@ -152,7 +155,9 @@ const SPHERE_GRID_HEIGHT = 10
 const POINT_LIGHT_POSITIONS_COUNT = 4
 const BDRF_INTEGRATION_PLANE_WIDTH = 512
 const BDRF_INTEGRATION_PLANE_HEIGHT = 512
-const SKYBOX_SIDE_SIZE = 1024
+const SKYBOX_SIDE_SIZE = 512
+
+let convolutionState = null
 
 const TONEMAPPING_MODES = [
   'aces',
@@ -293,6 +298,8 @@ const CUBEMAP_SIDES_CAPTURE_UP_VECTORS = [
   [0, -1, 0],
 ]
 
+const DEFAULT_SKYBOX = 'tokyo'
+
 // prettier-ignore
 const SKYBOX_IMAGE_SOURCES = new Map([
   ['mon-valley', hdrImageSrc0],
@@ -301,9 +308,10 @@ const SKYBOX_IMAGE_SOURCES = new Map([
 ])
 
 const TWEAK_PARAMS = {
+  playAnim: true,
   useEnvDiffuseLight: true,
   useEnvSpecularLight: true,
-  image: 'mon-valley',
+  image: DEFAULT_SKYBOX,
 }
 
 // const spector = new Spector()
@@ -318,6 +326,9 @@ const pane = new Pane()
 pane.registerPlugin(TweakpaneThumbnailListPlugin)
 hideNoneOptionFromTweakpane()
 pane.element.parentNode.style.setProperty('width', '400px')
+pane.addInput(TWEAK_PARAMS, 'playAnim', {
+  label: 'Play Animation',
+})
 pane
   .addBlade({
     view: 'list',
@@ -340,6 +351,7 @@ pane
     pointLightIntensityFloat32[0] = value
   })
 pane
+
   .addInput(TWEAK_PARAMS, 'useEnvDiffuseLight', {
     label: 'use environment diffuse light',
   })
@@ -359,32 +371,27 @@ pane
     view: 'thumbnail-list',
     options: [
       {
-        text: 'MonValley Lookout',
+        text: 'Moonlit Golf',
         value: 'mon-valley',
         src: transformAssetSrc(skyboxImageSrc0),
       },
       {
-        text: 'Theatre Center',
+        text: 'Little Paris',
         value: 'theatre',
         src: transformAssetSrc(skyboxImageSrc1),
       },
       {
-        text: 'Tokyo BigSight',
+        text: 'Qwantani Noon',
         value: 'tokyo',
         src: transformAssetSrc(skyboxImageSrc2),
       },
     ],
   })
   .on('change', ({ value: { value } }) => {
-    const myHDR = new HDRImage()
-    myHDR.onload = () => {
-      convoluteHDREnvironment([
-        hdrTexture.width,
-        hdrTexture.height,
-        hdrTexture.dataFloat,
-      ])
-    }
-    myHDR.src = transformAssetSrc(SKYBOX_IMAGE_SOURCES.get(value))
+    loadHDRImage(SKYBOX_IMAGE_SOURCES.get(value)).then((hdrTexture) => {
+      hdrTexCurr = hdrTexture
+      hdrTexChanged = true
+    })
   })
 
 // const toHalfWorker = new ToHalfFloatWebWorker()
@@ -416,7 +423,7 @@ perspCamera.position = [10.84, -0.17, 8.98]
 perspCamera.lookAt = [0, 0, 0]
 perspCamera.updateProjectionMatrix()
 
-new CameraController(perspCamera, canvas, false)
+new CameraController(perspCamera, canvas, false, isTouchDevice() ? 2 : 0.85)
 
 // used for capturing each cube face when converting equirectangular to cubemap
 const captureFaceCamera = new PerspectiveCamera(
@@ -464,13 +471,13 @@ for (let y = 0; y < SPHERE_GRID_Y_COUNT; y++) {
     )
     sphere.setPosition([sphereX, sphereY, -5])
 
-    const metallic = y / SPHERE_GRID_Y_COUNT //Easing.quad_In(y / SPHERE_GRID_Y_COUNT)
+    const metallic = y / (SPHERE_GRID_Y_COUNT - 1) //Easing.quad_In(y / SPHERE_GRID_Y_COUNT)
     sphere.setUniform('u_metallic', {
       type: gl.FLOAT,
       value: metallic,
     })
 
-    const roughness = 1 / SPHERE_GRID_X_COUNT + x / SPHERE_GRID_X_COUNT //Easing.quad_In(x / SPHERE_GRID_X_COUNT)
+    const roughness = Math.max(0.04, x / (SPHERE_GRID_X_COUNT - 1))
     sphere.setUniform('u_roughness', {
       type: gl.FLOAT,
       value: roughness,
@@ -570,11 +577,17 @@ const pointLightsPositions = []
 const pointLightsColors = []
 const lightDebuggers = []
 
+const colors = [
+  normalizeRGB([243, 156, 18]),
+  normalizeRGB([41, 128, 185]),
+  normalizeRGB([192, 57, 43]),
+  normalizeRGB([142, 68, 173]),
+]
 for (let i = 0; i < POINT_LIGHT_POSITIONS_COUNT; i++) {
   pointLightsPositions.push(new Float32Array(3))
 
-  const pointLight = [Math.random(), Math.random(), Math.random()]
-  // const pointLight = [1, 1, 1]
+  // const pointLight = [Math.random(), Math.random(), Math.random()]
+  const pointLight = colors[i]
 
   pointLightsColors.push(new Float32Array(pointLight))
 
@@ -667,16 +680,12 @@ gl.getExtension('EXT_color_buffer_float')
 gl.getExtension('OES_texture_half_float')
 gl.getExtension('OES_texture_half_float_linear')
 
-loadHDRImage(hdrImageSrc2).then((hdrTexture) => {
-  // toHalfWorker.postMessage(
-  //   [hdrTexture.width, hdrTexture.height, hdrTexture.dataFloat],
-  //   [hdrTexture.dataFloat.buffer],
-  // )
-  convoluteHDREnvironment([
-    hdrTexture.width,
-    hdrTexture.height,
-    hdrTexture.dataFloat,
-  ])
+let hdrTexChanged = false
+let hdrTexCurr
+
+loadHDRImage(SKYBOX_IMAGE_SOURCES.get(DEFAULT_SKYBOX)).then((hdrTexture) => {
+  hdrTexCurr = hdrTexture
+  hdrTexChanged = true
 })
 
 Promise.all([
@@ -717,6 +726,36 @@ window.addEventListener('resize', onResize)
 
 function drawFrame(ts) {
   requestAnimationFrame(drawFrame)
+
+  if (hdrTexChanged) {
+    convolutionState = {
+      width: hdrTexCurr.width,
+      height: hdrTexCurr.height,
+      imageData: hdrTexCurr.dataFloat,
+      step: 0,
+      maxSteps: 3, // cubemap, irradiance, prefilter
+    }
+    hdrTexChanged = false
+  }
+
+  if (convolutionState) {
+    // Process one step per frame
+    if (convolutionState.step === 0) {
+      convoluteCubemap(convolutionState)
+    } else if (convolutionState.step === 10) {
+      convolveIrradiance()
+    } else if (convolutionState.step === 20) {
+      convolvePrefilter()
+    } else if (convolutionState.step === 30) {
+      convolveBRDF()
+      convolutionState = null // Done
+      return
+    }
+    convolutionState.step++
+    return
+  }
+
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1)
 
   perspCamera.updateViewMatrix()
 
@@ -764,37 +803,39 @@ function drawFrame(ts) {
 
   // Lighing UBO and light debuggers
   gl.bindBuffer(gl.UNIFORM_BUFFER, lightingUBO)
-  const speed = ts * 0.001
-  for (let i = 0; i < POINT_LIGHT_POSITIONS_COUNT; i++) {
-    const lightStep = (Math.PI * 2) / POINT_LIGHT_POSITIONS_COUNT
+  if (TWEAK_PARAMS.playAnim) {
+    const speed = ts * 0.001
+    for (let i = 0; i < POINT_LIGHT_POSITIONS_COUNT; i++) {
+      const lightStep = (Math.PI * 2) / POINT_LIGHT_POSITIONS_COUNT
 
-    const lightPos = [
-      Math.cos(i * lightStep + speed) * (Math.sin(speed) * 2 + 4),
-      Math.sin(i * lightStep + speed) * (Math.sin(speed) * 2 + 4),
-      Math.cos(speed) * 4,
-    ]
-    pointLightsPositions[i][0] = lightPos[0]
-    pointLightsPositions[i][1] = lightPos[1]
-    pointLightsPositions[i][2] = lightPos[2]
+      const lightPos = [
+        Math.cos(i * lightStep + speed) * (Math.sin(speed) * 2 + 4),
+        Math.sin(i * lightStep + speed) * (Math.sin(speed) * 2 + 4),
+        Math.cos(speed) * 3,
+      ]
+      pointLightsPositions[i][0] = lightPos[0]
+      pointLightsPositions[i][1] = lightPos[1]
+      pointLightsPositions[i][2] = lightPos[2]
 
-    lightDebuggers[i].setPosition(lightPos).updateWorldMatrix()
+      lightDebuggers[i].setPosition(lightPos).updateWorldMatrix()
 
-    gl.bufferSubData(
-      gl.UNIFORM_BUFFER,
-      lightingUBOInfo.uniforms.pointLightPositions.offset +
-        i *
-          lightingUBOInfo.uniforms.pointLightPositions.size *
-          Float32Array.BYTES_PER_ELEMENT,
-      pointLightsPositions[i],
-      0,
-    )
-    gl.bufferSubData(
-      gl.UNIFORM_BUFFER,
-      lightingUBOInfo.uniforms.pointLightColors.offset +
-        i * 4 * Float32Array.BYTES_PER_ELEMENT,
-      pointLightsColors[i],
-      0,
-    )
+      gl.bufferSubData(
+        gl.UNIFORM_BUFFER,
+        lightingUBOInfo.uniforms.pointLightPositions.offset +
+          i *
+            lightingUBOInfo.uniforms.pointLightPositions.size *
+            Float32Array.BYTES_PER_ELEMENT,
+        pointLightsPositions[i],
+        0,
+      )
+      gl.bufferSubData(
+        gl.UNIFORM_BUFFER,
+        lightingUBOInfo.uniforms.pointLightColors.offset +
+          i * 4 * Float32Array.BYTES_PER_ELEMENT,
+        pointLightsColors[i],
+        0,
+      )
+    }
   }
   gl.bufferSubData(
     gl.UNIFORM_BUFFER,
@@ -837,12 +878,31 @@ function drawFrame(ts) {
   gl.depthFunc(gl.LESS)
   scene.updateWorldMatrix().render()
 
-  brdfConvoluteTexDebugView.render()
+  // brdfConvoluteTexDebugView.render()
   // compressedTexS3TCPlaneDebugView.render()
 }
 
-function convoluteHDREnvironment([width, height, imageData]) {
-  const skyboxTexture = gl.createTexture()
+var skyboxTexture
+var cubemapTexture
+var irradianceTexture
+var prefilteredEnvironmentTexture
+var brdfLutTexture
+
+let captureFBO = null
+let captureRBO = null
+
+function convoluteCubemap(state) {
+  const { width, height, imageData } = state
+
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1)
+
+  // Clean up old texture
+  if (skyboxTexture) {
+    gl.deleteTexture(skyboxTexture)
+  }
+
+  // Create equirectangular texture
+  skyboxTexture = gl.createTexture()
   gl.bindTexture(gl.TEXTURE_2D, skyboxTexture)
   gl.texImage2D(
     gl.TEXTURE_2D,
@@ -855,26 +915,22 @@ function convoluteHDREnvironment([width, height, imageData]) {
     gl.FLOAT,
     imageData,
   )
-
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-
   gl.bindTexture(gl.TEXTURE_2D, null)
 
-  brdfConvoluteTexDebugView.texture = skyboxTexture
-
-  // at this point the equirectangular texture is mapped onto a unit cube
   equirectangularToCubemap.texture = skyboxTexture
 
-  // our framebuffer to hold our 6 equirectangularToCubemap textures
-  const captureCubeSidesFramebuffer = gl.createFramebuffer()
+  // Create/reuse FBO and RBO
+  if (!captureFBO) {
+    captureFBO = gl.createFramebuffer()
+    captureRBO = gl.createRenderbuffer()
+  }
 
-  gl.bindFramebuffer(gl.FRAMEBUFFER, captureCubeSidesFramebuffer)
-  // attach depth buffer
-  const depthBuffer = gl.createRenderbuffer()
-  gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer)
+  gl.bindFramebuffer(gl.FRAMEBUFFER, captureFBO)
+  gl.bindRenderbuffer(gl.RENDERBUFFER, captureRBO)
   gl.renderbufferStorage(
     gl.RENDERBUFFER,
     gl.DEPTH_COMPONENT16,
@@ -885,16 +941,20 @@ function convoluteHDREnvironment([width, height, imageData]) {
     gl.FRAMEBUFFER,
     gl.DEPTH_ATTACHMENT,
     gl.RENDERBUFFER,
-    depthBuffer,
+    captureRBO,
   )
 
-  const cubemapTexture = gl.createTexture()
+  // Clean up old cubemap
+  if (cubemapTexture) {
+    gl.deleteTexture(cubemapTexture)
+  }
+
+  // Create cubemap texture
+  cubemapTexture = gl.createTexture()
   gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubemapTexture)
   for (let i = 0; i < 6; i++) {
-    const side = gl.TEXTURE_CUBE_MAP_POSITIVE_X + i
-    // important - store each face with 16bit floating values to preserve HDR
     gl.texImage2D(
-      side,
+      gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
       0,
       gl.RGBA16F,
       SKYBOX_SIDE_SIZE,
@@ -904,7 +964,6 @@ function convoluteHDREnvironment([width, height, imageData]) {
       gl.HALF_FLOAT,
       null,
     )
-    // TODO: could we do proper mipmapping here and use different wrapping and min/mag filtering?
   }
   gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
   gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
@@ -916,11 +975,8 @@ function convoluteHDREnvironment([width, height, imageData]) {
   )
   gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
 
-  // lets capture the equirectangular 2D texture onto the equirectangularToCubemap faces
-
-  gl.bindFramebuffer(gl.FRAMEBUFFER, captureCubeSidesFramebuffer)
+  // Render to each cubemap face
   gl.viewport(0, 0, SKYBOX_SIDE_SIZE, SKYBOX_SIDE_SIZE)
-
   for (let i = 0; i < 6; i++) {
     gl.framebufferTexture2D(
       gl.FRAMEBUFFER,
@@ -931,24 +987,29 @@ function convoluteHDREnvironment([width, height, imageData]) {
     )
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-    // look at each correct face with our camera in the center of the world
     captureFaceCamera.lookAt = CUBEMAP_SIDES_CAPTURE_LOOK_ATS[i]
     captureFaceCamera.upVector = CUBEMAP_SIDES_CAPTURE_UP_VECTORS[i]
     captureFaceCamera.updateViewMatrix().updateProjectionViewMatrix()
 
-    // render to appropriate cube texture with current camera lookAt orientation
     equirectangularToCubemap.render(captureFaceCamera)
   }
-  // we need to generate mipmaps and use trilinear filtering on the environment map
-  // to remove bright dots in the pre-filter convolution
-  // see https://learnopengl.com/PBR/IBL/Specular-IBL
-  gl.generateMipmap(gl.TEXTURE_CUBE_MAP)
 
-  // After generating the HDR cubemap, we need to convolute it to a 32x32 irradiance map
+  gl.generateMipmap(gl.TEXTURE_CUBE_MAP)
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+}
+
+function convolveIrradiance() {
   cubemapToIrradiance.envTexture = cubemapTexture
 
   const irradianceCubeTexSize = 32
-  const irradianceTexture = gl.createTexture()
+
+  // Clean up old texture
+  if (irradianceTexture) {
+    gl.deleteTexture(irradianceTexture)
+  }
+
+  // Create irradiance texture
+  irradianceTexture = gl.createTexture()
   gl.bindTexture(gl.TEXTURE_CUBE_MAP, irradianceTexture)
   for (let i = 0; i < 6; i++) {
     gl.texImage2D(
@@ -969,7 +1030,9 @@ function convoluteHDREnvironment([width, height, imageData]) {
   gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
   gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
 
-  // gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer)
+  // Reuse FBO/RBO, just resize
+  gl.bindFramebuffer(gl.FRAMEBUFFER, captureFBO)
+  gl.bindRenderbuffer(gl.RENDERBUFFER, captureRBO)
   gl.renderbufferStorage(
     gl.RENDERBUFFER,
     gl.DEPTH_COMPONENT16,
@@ -977,6 +1040,7 @@ function convoluteHDREnvironment([width, height, imageData]) {
     irradianceCubeTexSize,
   )
 
+  // Render to each face
   gl.viewport(0, 0, irradianceCubeTexSize, irradianceCubeTexSize)
   for (let i = 0; i < 6; i++) {
     gl.framebufferTexture2D(
@@ -987,17 +1051,25 @@ function convoluteHDREnvironment([width, height, imageData]) {
       0,
     )
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
     captureFaceCamera.lookAt = CUBEMAP_SIDES_CAPTURE_LOOK_ATS[i]
     captureFaceCamera.upVector = CUBEMAP_SIDES_CAPTURE_UP_VECTORS[i]
     captureFaceCamera.updateViewMatrix().updateProjectionViewMatrix()
+
     cubemapToIrradiance.render(captureFaceCamera)
   }
 
-  // pre-filtering an environment map is quite similar to how we convoluted an irradiance map
-  // the difference being that we now account for roughness and store sequentially rougher
-  // reflections in the pre-filtered map's mip levels.
-  const prefilteredEnvironmentTexture = gl.createTexture()
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+}
+
+function convolvePrefilter() {
+  // Clean up old texture
+  if (prefilteredEnvironmentTexture) {
+    gl.deleteTexture(prefilteredEnvironmentTexture)
+  }
+
   const prefilteredEnvironmentTexSize = 128
+  prefilteredEnvironmentTexture = gl.createTexture()
   gl.bindTexture(gl.TEXTURE_CUBE_MAP, prefilteredEnvironmentTexture)
   for (let i = 0; i < 6; i++) {
     gl.texImage2D(
@@ -1021,23 +1093,19 @@ function convoluteHDREnvironment([width, height, imageData]) {
     gl.LINEAR_MIPMAP_LINEAR,
   )
   gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-  // important - we need to generate mipmaps. Each mip level will store a blurrier prefiltered map
-  // for each material roughness level
   gl.generateMipmap(gl.TEXTURE_CUBE_MAP)
 
   cubemapToPrefilterEnvironment.envTexture = cubemapTexture
-  // we will render to each mip level of the prefilteredEnvironmentTexture
-  // with varying rougness
-  // roughness: 0.0  = mip level 0
-  // roughness: 0.25 = mip level 1
-  // roughness: 0.5  = mip level 2
-  // roughness: 0.75 = mip level 3
-  // roughness: 1.0  = mip level 4
+
+  gl.bindFramebuffer(gl.FRAMEBUFFER, captureFBO)
+
+  // Render to each mip level
   const maxMipLevels = 5
   for (let mip = 0; mip < maxMipLevels; mip++) {
     const mipWidth = prefilteredEnvironmentTexSize * Math.pow(0.5, mip)
     const mipHeight = prefilteredEnvironmentTexSize * Math.pow(0.5, mip)
-    // gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer)
+
+    gl.bindRenderbuffer(gl.RENDERBUFFER, captureRBO)
     gl.renderbufferStorage(
       gl.RENDERBUFFER,
       gl.DEPTH_COMPONENT16,
@@ -1068,9 +1136,16 @@ function convoluteHDREnvironment([width, height, imageData]) {
     }
   }
 
-  // create the BRDF convolution into a 2d 512x512 texture
-  // note that we use a 16-bit precision floating format as recommended by Epic Games
-  const brdfLutTexture = gl.createTexture()
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+}
+
+function convolveBRDF() {
+  // Clean up old texture
+  if (brdfLutTexture) {
+    gl.deleteTexture(brdfLutTexture)
+  }
+
+  brdfLutTexture = gl.createTexture()
   gl.bindTexture(gl.TEXTURE_2D, brdfLutTexture)
   gl.texImage2D(
     gl.TEXTURE_2D,
@@ -1088,7 +1163,8 @@ function convoluteHDREnvironment([width, height, imageData]) {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
 
-  // gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer)
+  gl.bindFramebuffer(gl.FRAMEBUFFER, captureFBO)
+  gl.bindRenderbuffer(gl.RENDERBUFFER, captureRBO)
   gl.renderbufferStorage(
     gl.RENDERBUFFER,
     gl.DEPTH_COMPONENT16,
@@ -1110,22 +1186,14 @@ function convoluteHDREnvironment([width, height, imageData]) {
 
   gl.bindFramebuffer(gl.FRAMEBUFFER, null)
 
-  // brdfConvoluteTexDebugView.texture = brdfLutTexture
-
-  // gl.deleteTexture(skybox.texture)
+  // Update skybox and spheres with final textures
   skybox.texture = cubemapTexture
 
   for (const sphere of spheres) {
-    // gl.deleteTexture(sphere.irradianceTexture)
     sphere.irradianceMapTexture = irradianceTexture
     sphere.prefilterMapTexture = prefilteredEnvironmentTexture
     sphere.brdfLutTexture = brdfLutTexture
   }
-
-  // clean up
-  // gl.deleteTexture(skyboxTexture)
-  // gl.deleteFramebuffer(captureCubeSidesFramebuffer)
-  // gl.deleteRenderbuffer(depthBuffer)
 }
 
 function onResize() {
@@ -1165,33 +1233,6 @@ function loadHDRImage(src) {
     myHDR.onload = () => {
       resolve(myHDR)
     }
-  })
-}
-
-function loadGLTextureFromImage(imageSrc, format = gl.RGB) {
-  return new Promise((resolve, reject) => {
-    const image = new Image()
-    image.onload = () => {
-      const texture = gl.createTexture()
-      gl.bindTexture(gl.TEXTURE_2D, texture)
-      gl.texImage2D(
-        gl.TEXTURE_2D,
-        0,
-        format,
-        image.naturalWidth,
-        image.naturalHeight,
-        0,
-        format,
-        gl.UNSIGNED_BYTE,
-        image,
-      )
-      gl.generateMipmap(gl.TEXTURE_2D)
-
-      gl.bindTexture(gl.TEXTURE_2D, null)
-      resolve(texture)
-    }
-    image.onerror = (err) => reject(err)
-    image.src = transformAssetSrc(imageSrc)
   })
 }
 

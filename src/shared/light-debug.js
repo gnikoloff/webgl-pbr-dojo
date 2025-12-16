@@ -1,12 +1,17 @@
-import { createSphere, Drawable } from '../lib/hwoa-rang-gl2'
+import { createPlane, Drawable } from '../lib/hwoa-rang-gl2'
 
-import VERTEX_SHADER from './shaders/light-debug.vert'
 import FRAGMENT_SHADER from './shaders/light-debug.frag'
+import VERTEX_SHADER from './shaders/light-debug.vert'
 
-const geometry = createSphere({
-  radius: 0.2,
-  widthSegments: 20,
-  heightSegments: 20,
+// const geometry = createSphere({
+//   radius: 0.2,
+//   widthSegments: 20,
+//   heightSegments: 20,
+// })
+
+const geometry = createPlane({
+  width: 0.5,
+  height: 0.5,
 })
 
 export default class LightDebug extends Drawable {
@@ -25,7 +30,7 @@ export default class LightDebug extends Drawable {
     this.vertexCount = vertexCount
 
     const aPosition = gl.getAttribLocation(this.program, 'aPosition')
-    // const aUv = gl.getAttribLocation(this.program, 'aUv')
+    const aUv = gl.getAttribLocation(this.program, 'aUv')
 
     const interleavedBuffer = gl.createBuffer()
     const indexBuffer = gl.createBuffer()
@@ -43,6 +48,15 @@ export default class LightDebug extends Drawable {
       false,
       vertexStride * Float32Array.BYTES_PER_ELEMENT,
       0 * Float32Array.BYTES_PER_ELEMENT,
+    )
+    gl.enableVertexAttribArray(aUv)
+    gl.vertexAttribPointer(
+      aUv,
+      2,
+      gl.FLOAT,
+      false,
+      vertexStride * Float32Array.BYTES_PER_ELEMENT,
+      3 * Float32Array.BYTES_PER_ELEMENT,
     )
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer)

@@ -1,3 +1,5 @@
+#ifndef USE_UNIQUE_PROJECTION_VIEW_MATRIX
+
 uniform Projection {
   mat4 projMatrix;
   float zNear;
@@ -9,6 +11,8 @@ uniform View {
   vec3 cameraPosition;
   float time;
 };
+
+#endif
 
 uniform PostFX {
   float tonemappingMode;
