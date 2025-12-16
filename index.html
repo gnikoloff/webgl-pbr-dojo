@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vite App</title>
+  <title>WebGL PBR Dojo</title>
   <style>
     * {
       box-sizing: border-box;
@@ -14,22 +14,22 @@
     body {
       margin: 0;
       padding: 0;
+      font-size: 0.86rem;
       line-height: 1.6;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     }
 
     p {
       margin: 0;
-      font-size: 0.95rem;
     }
 
     h1 {
-      margin: 0 0 0.5rem 0;
-      /* font-weight: 500; */
+      margin: 0 0.5rem 0 0;
       font-size: 1.2rem;
     }
 
     ul {
+
       margin: 0;
       padding: 0 0 0 1rem;
     }
@@ -38,15 +38,21 @@
       color: inherit;
     }
 
-    #intro {
+    .section {
       padding-bottom: 0.5rem;
       margin-bottom: 0.5rem;
       border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     }
 
+    #title {
+      display: flex;
+      align-items: center;
+      margin: 0 0 0.5rem 0;
+    }
+
     #header {
       position: fixed;
-      top: 0;
+      bottom: 0;
       left: 0;
       background-color: rgba(0, 0, 0, 0.56);
       max-width: 400px;
@@ -58,33 +64,68 @@
     .instructions {
       display: none;
     }
+
+    #info-icon {
+      display: block;
+      width: 24px;
+      fill: white;
+      cursor: pointer;
+    }
+
+    #collapsable {
+      display: none;
+    }
   </style>
 </head>
 
 <body>
   <header id="header">
-    <div id="intro">
-      <h1>PBR Dojo</h1>
-      <p>Explore Physically Based Rendering with WebGL.</p>
-      <p>Source code available <a href="https://github.com/gnikoloff/webgl-pbr-dojo" target="_blank">here</a>.</p>
-      <p>Made by <a href="https://georgi-nikolov.com" target="_blank">Georgi Nikolov</a></p>
-    </div>
-    <div class="instructions" id="instructions-desktop">
-      <ul>
-        <li>Look around by dragging the mouse.</li>
-      </ul>
-    </div>
-    <div class="instructions" id="instructions-touch">
-      <ul>
-        <li>Look around by dragging a finger.</li>
-        <li>Zoom by pinching.</li>
-        <li>Pan by dragging three fingers.</li>
-      </ul>
+
+    <div id="collapsable">
+      <div class="section">
+        <p>Textures from <a href="https://polyhaven.com/" target="_blank">Poly Haven</a>. Thanks!</p>
+      </div>
+      <div class="instructions section" id="instructions-desktop">
+        <ul>
+          <li>Look around by dragging the left mouse button</li>
+          <li>Pan by dragging the right mouse button</li>
+          <li>Zoom by mouse wheel</li>
+        </ul>
+      </div>
+
+      <div class="instructions section" id="instructions-touch">
+        <ul>
+          <li>Look around by dragging a finger</li>
+          <li>Zoom by pinching</li>
+          <li>Pan by dragging three fingers</li>
+        </ul>
+      </div>
+      <div id="intro" class="section">
+        <p>Explore Physically Based Rendering with WebGL.</p>
+        <p>Source code available <a href="https://github.com/gnikoloff/webgl-pbr-dojo" target="_blank">here</a>.</p>
+        <p>Made by <a href="https://georgi-nikolov.com" target="_blank">Georgi Nikolov</a></p>
+      </div>
     </div>
 
+    <div id="title">
+      <h1>WebGL PBR Dojo</h1>
+      <svg id="info-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd"
+          d="M12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2C16.714 2 19.0711 2 20.5355 3.46447C22 4.92893 22 7.28595 22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22ZM12 17.75C12.4142 17.75 12.75 17.4142 12.75 17V11C12.75 10.5858 12.4142 10.25 12 10.25C11.5858 10.25 11.25 10.5858 11.25 11V17C11.25 17.4142 11.5858 17.75 12 17.75ZM12 7C12.5523 7 13 7.44772 13 8C13 8.55228 12.5523 9 12 9C11.4477 9 11 8.55228 11 8C11 7.44772 11.4477 7 12 7Z" />
+      </svg>
+    </div>
   </header>
   <div id="app"></div>
   <script type="module" src="/src/3-ibl-specular-radiance/ibl-specular-radiance.js"></script>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-V1CG43SG4J"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-V1CG43SG4J');
+  </script>
 </body>
 
 </html>
