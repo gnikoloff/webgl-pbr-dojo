@@ -9,6 +9,10 @@
     "url": "https://georgi-nikolov.com"
   },
   "scripts": {
+    "setup": "npm run setup:math && npm run setup:gl2 && npm run setup:tween && npm i",
+    "setup:math": "cd lib/hwoa-rang-gl2/lib/hwoa-rang-math && npm i && npm run start:dev",
+    "setup:gl2": "cd lib/hwoa-rang-gl2 && npm i && npm run start:dev",
+    "setup:tween": "cd lib/hwoa-rang-tween && npm i && npm run start:dev",
     "dev": "DEV=1 vite --host",
     "build": "vite build",
     "preview": "vite preview",
