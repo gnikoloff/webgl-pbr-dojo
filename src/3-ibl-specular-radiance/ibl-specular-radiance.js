@@ -158,7 +158,10 @@ const BDRF_INTEGRATION_PLANE_WIDTH = 512
 const BDRF_INTEGRATION_PLANE_HEIGHT = 512
 const SKYBOX_SIDE_SIZE = 1024
 
+const MOBILE_BREAKPOINT = 600
+
 let convolutionState = null
+let infoOpen = innerWidth > MOBILE_BREAKPOINT
 
 const TONEMAPPING_MODES = [
   'aces',
@@ -323,7 +326,12 @@ const pointLightIntensityFloat32 = new Float32Array([16])
 const diffuseLightMixFactorFloat32 = new Float32Array([1]) // image diffuse light on by default
 const specularLightMixFactorFloat32 = new Float32Array([1]) // image specular light on by default
 
-const pane = new Pane()
+let collapsableRoot = document.getElementById('collapsable')
+
+const pane = new Pane({
+  title: 'Parameters',
+  expanded: innerWidth > MOBILE_BREAKPOINT,
+})
 pane.registerPlugin(TweakpaneThumbnailListPlugin)
 hideNoneOptionFromTweakpane()
 pane.element.parentNode.style.setProperty('width', '400px')
@@ -724,12 +732,20 @@ Promise.all([
 requestAnimationFrame(drawFrame)
 onResize()
 window.addEventListener('resize', onResize)
-addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('header').style.display = 'block'
   var el = isTouchDevice()
     ? document.getElementById('instructions-touch')
     : document.getElementById('instructions-desktop')
   el.style.display = 'block'
+
+  if (infoOpen) {
+    collapsableRoot.style.display = 'block'
+  }
+})
+document.getElementById('info-icon').addEventListener('click', () => {
+  infoOpen = !infoOpen
+  collapsableRoot.style.display = infoOpen ? 'block' : 'none'
 })
 
 function drawFrame(ts) {
