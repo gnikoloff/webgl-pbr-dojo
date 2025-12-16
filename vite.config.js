@@ -7,6 +7,7 @@ export default ({ mode }) => {
   return defineConfig({
     plugins: [glsl()],
     assetsInclude: ['**/*.hdr', '**/*.ktx', '**/*.dds'],
+    base: '/webgl-pbr-dojo/',
     build: {
       assetsInlineLimit: 0,
       outDir: 'docs/',
