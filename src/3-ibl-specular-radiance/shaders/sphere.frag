@@ -110,37 +110,21 @@ void main () {
     Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
   }
 
+  // IBL (Image Based Lighting)
   vec3 F = fresnelSchlickRoughness(NdotV, F0, roughness);
-
   vec3 kS = F;
   vec3 kD = 1.0 - kS;
-  kD *= 1.0 - metallic;	  
-    
+  kD *= 1.0 - metallic;
+
   vec3 irradiance = texture(u_irradianceMap, N).rgb;
-  vec3 diffuse = irradiance * albedo;
+  vec3 diffuse = irradiance * albedo * diffuseEnvLightMixFactor;
 
   vec3 R = reflect(-V, N);
-    
   vec3 prefilteredColor = textureLod(u_prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;   
-  vec2 envBRDF  = texture(u_brdfLUT, vec2(NdotV, roughness)).rg;
-  vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
+  vec2 envBRDF = texture(u_brdfLUT, vec2(NdotV, roughness)).rg;
+  vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y) * specularEnvLightMixFactor;
 
-  // vec3 ambient = vec3(0.03) * albedo * ao;
-  // vec3 ambient = vec3(0.0);
-
-  // irradiance map
-  vec3 irradiancekS = fresnelSchlick(max(dot(N, V), 0.0), F0);
-  vec3 irradiancekD = 1.0 - irradiancekS;
-  irradiancekD *= 1.0 - metallic;
-  vec3 irradianceFromMap = texture(u_irradianceMap, N).rgb;
-  vec3 diffuseFromMap = irradianceFromMap * albedo;
-  
-  vec3 ambient = mix(vec3(0.03) * albedo * ao, kD * diffuse * ao, diffuseEnvLightMixFactor);
-  ambient = mix(ambient, (irradiancekD * diffuseFromMap + specular) * ao, specularEnvLightMixFactor);
-
-  // vec3 I = normalize(vWorldPos - cameraPosition);
-  // vec3 R = reflect(I, N);
-  // vec4 skyboxColor = texture(u_environmentMap, R);
+  vec3 ambient = (kD * diffuse + specular) * ao;
   
   vec3 color = ambient + Lo;
     
