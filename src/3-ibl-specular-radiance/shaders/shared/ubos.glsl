@@ -15,7 +15,7 @@ uniform View {
 #endif
 
 uniform PostFX {
-  float tonemappingMode;
+  highp int tonemappingMode;
 };
 
 #ifdef USE_PBR

@@ -8,34 +8,14 @@
 #include ../../../shared/shaders/tone-mapping/uncharted.glsl;
 #include ../../../shared/shaders/tone-mapping/unreal.glsl;
 
-vec3 applyTonemapping (vec3 color, float tonemappingMode) {
-  return mix(
-    aces(color),
-    mix(
-      tonemapFilmic(color),
-      mix(
-        lottes(color),
-        mix(
-          reinhard(color),
-          mix(
-            reinhard2(color),
-            mix(
-              uchimura(color),
-              mix(
-                uncharted2(color),
-                unreal(color),
-                clamp(tonemappingMode, 6.0, 7.0) - 6.0
-              ),
-              clamp(tonemappingMode, 5.0, 6.0) - 5.0
-            ),
-            clamp(tonemappingMode, 4.0, 5.0) - 4.0
-          ),
-          clamp(tonemappingMode, 3.0, 4.0) - 3.0
-        ),
-        clamp(tonemappingMode, 2.0, 3.0) - 2.0
-      ),
-      clamp(tonemappingMode, 1.0, 2.0) - 1.0
-    ),
-    clamp(tonemappingMode, 0.0, 1.0)
-  );
+vec3 applyTonemapping(vec3 color, int tonemappingMode) {
+  if (tonemappingMode == 0) return aces(color);
+  else if (tonemappingMode == 1) return tonemapFilmic(color);
+  else if (tonemappingMode == 2) return lottes(color);
+  else if (tonemappingMode == 3) return reinhard(color);
+  else if (tonemappingMode == 4) return reinhard2(color);
+  else if (tonemappingMode == 5) return uchimura(color);
+  else if (tonemappingMode == 6) return uncharted2(color);
+  else if (tonemappingMode == 7) return unreal(color);
+  return color; // fallback
 }

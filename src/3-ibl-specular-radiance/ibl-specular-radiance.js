@@ -324,7 +324,7 @@ const TWEAK_PARAMS = {
 // const spector = new Spector()
 // spector.displayUI()
 
-const tonemappingModeFloat32 = new Float32Array([2])
+const tonemappingModeInt = new Int32Array([2])
 const pointLightIntensityFloat32 = new Float32Array([16])
 const diffuseLightMixFactorFloat32 = new Float32Array([1]) // image diffuse light on by default
 const specularLightMixFactorFloat32 = new Float32Array([1]) // image specular light on by default
@@ -349,7 +349,7 @@ pane
     value: TONEMAPPING_MODES[2],
   })
   .on('change', ({ value }) => {
-    tonemappingModeFloat32[0] = TONEMAPPING_MODES.indexOf(value)
+    tonemappingModeInt[0] = TONEMAPPING_MODES.indexOf(value)
   })
 pane
   .addBlade({
@@ -884,7 +884,7 @@ function drawFrame(ts) {
   gl.bufferSubData(
     gl.UNIFORM_BUFFER,
     postFXUBOInfo.uniforms.tonemappingMode.offset,
-    tonemappingModeFloat32,
+    tonemappingModeInt,
   )
 
   gl.enable(gl.DEPTH_TEST)
